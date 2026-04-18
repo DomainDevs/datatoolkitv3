@@ -1,0 +1,6 @@
+*.dll
+*.pdb
+*.cache
+DataToolkit/Library/DataToolkit.Library/obj/
+DataToolkit/Library/DataToolkit.Library/bin/
+DataToolkit/.vs/
