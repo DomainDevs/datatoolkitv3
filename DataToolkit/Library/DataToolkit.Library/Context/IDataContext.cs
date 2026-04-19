@@ -5,9 +5,9 @@ namespace DataToolkit.Library.Context
     {
         void BeginTransaction();
         void Commit();
-        void Dispose();
+        Task<int> ExecuteAsync(string sql, object? param = null);
+        Task<IEnumerable<T>> Query<T>(string sql, object? param = null);
         Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null);
-        Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null);
         void Rollback();
     }
 }
