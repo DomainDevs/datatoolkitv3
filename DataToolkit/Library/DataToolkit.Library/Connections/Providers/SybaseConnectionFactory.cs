@@ -1,15 +1,14 @@
-﻿using DataToolkit.Library.Connections.Abstractions;
-using Microsoft.Data.SqlClient;
+﻿using AdoNetCore.AseClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace DataToolkit.Library.Connections.Providers.SqlServer;
+namespace DataToolkit.Library.Connections.Providers;
 
-public class SqlServerConnectionFactory : IDbConnectionFactory
+public class SybaseConnectionFactory : IDbConnectionFactory
 {
     private readonly IConfiguration _configuration;
 
-    public SqlServerConnectionFactory(IConfiguration configuration)
+    public SybaseConnectionFactory(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -20,6 +19,6 @@ public class SqlServerConnectionFactory : IDbConnectionFactory
         if (string.IsNullOrEmpty(connectionString))
             throw new InvalidOperationException($"No se encontró la cadena de conexión para el alias '{dbAlias}'");
 
-        return new SqlConnection(connectionString);
+        return new AseConnection(connectionString);
     }
 }

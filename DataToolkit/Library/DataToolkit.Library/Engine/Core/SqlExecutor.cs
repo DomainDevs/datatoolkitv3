@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using DataToolkit.Library.Common;
+using DataToolkit.Library.Exceptions;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Mapping;
 using Serilog;

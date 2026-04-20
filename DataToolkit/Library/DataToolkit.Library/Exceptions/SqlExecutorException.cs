@@ -1,4 +1,4 @@
-﻿namespace DataToolkit.Library.Common;
+﻿namespace DataToolkit.Library.Exceptions;
 public class SqlExecutorException : Exception
 {
     public string? SqlQuery { get; }
