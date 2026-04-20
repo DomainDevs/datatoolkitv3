@@ -1,9 +1,11 @@
 ﻿using AdoNetCore.AseClient;
+using DataToolkit.Library.Connections;
+using DataToolkit.Library.Connections.Abstractions;
 using Microsoft.Data.SqlClient;
 using System.Collections.Concurrent;
 using System.Data;
 
-namespace DataToolkit.Library.Connections;
+namespace DataToolkit.Library.Infrastructure.ConnectionRouting;
 
 /// <summary>
 /// Fábrica que permite crear múltiples conexiones a diferentes motores de base de datos,

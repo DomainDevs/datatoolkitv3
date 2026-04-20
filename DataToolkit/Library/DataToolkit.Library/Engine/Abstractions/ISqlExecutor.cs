@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using DataToolkit.Library.Common;
+using DataToolkit.Library.Engine.Mapping;
 using System.Data;
 
-namespace DataToolkit.Library.Sql
+namespace DataToolkit.Library.Engine.Abstractions
 {
     public interface ISqlExecutor
     {

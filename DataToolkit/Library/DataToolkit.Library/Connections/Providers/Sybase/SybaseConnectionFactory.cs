@@ -1,8 +1,9 @@
 ﻿using AdoNetCore.AseClient;
+using DataToolkit.Library.Connections.Abstractions;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace DataToolkit.Library.Connections;
+namespace DataToolkit.Library.Connections.Providers.Sybase;
 
 public class SybaseConnectionFactory : IDbConnectionFactory
 {

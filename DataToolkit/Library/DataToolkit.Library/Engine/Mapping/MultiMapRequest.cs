@@ -1,5 +1,4 @@
-﻿
-namespace DataToolkit.Library.Common;
+﻿namespace DataToolkit.Library.Engine.Mapping;
 /// <summary>Permite encapsular consultas con mapeo múltiple (multi-mapping).
 /// <param Sql="">Sentencias SQL</param>
 /// <param Parameters="">Parámetros para la consulta</param>

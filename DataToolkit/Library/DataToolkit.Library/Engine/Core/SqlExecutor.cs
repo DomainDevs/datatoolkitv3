@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using DataToolkit.Library.Common;
+using DataToolkit.Library.Engine.Abstractions;
+using DataToolkit.Library.Engine.Mapping;
 using Serilog;
 using System.Data;
 
-namespace DataToolkit.Library.Sql;
+namespace DataToolkit.Library.Engine.Core;
 
 /// <summary>
 /// Ejecuta consultas SQL y procedimientos almacenados usando Dapper,
@@ -150,8 +152,7 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     {
         return ExecuteSafe(() =>
         {
-            var result = SqlMapper.Query(
-                _connection,
+            var result = _connection.Query(
                 request.Sql,
                 request.Types,
                 objects => request.MapFunction(objects),
@@ -172,8 +173,7 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     {
         return await ExecuteSafeAsync(async () =>
         {
-            var result = await SqlMapper.QueryAsync(
-                _connection,
+            var result = await _connection.QueryAsync(
                 request.Sql,
                 request.Types,
                 objects => request.MapFunction(objects),

@@ -1,8 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using DataToolkit.Library.Connections.Abstractions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace DataToolkit.Library.Connections;
+namespace DataToolkit.Library.Connections.Providers.SqlServer;
 
 public class SqlServerConnectionFactory : IDbConnectionFactory
 {
