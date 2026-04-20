@@ -1,53 +1,29 @@
 ﻿using AdoNetCore.AseClient;
-using DataToolkit.Library.Connections;
 using Microsoft.Data.SqlClient;
-using System.Collections.Concurrent;
 using System.Data;
+using DataToolkit.Library.Connections;
+using DataToolkit.Library.Infrastructure.ConnectionRouting;
 
 namespace DataToolkit.Library.Infrastructure.ConnectionRouting;
 
-/// <summary>
-/// Fábrica que permite crear múltiples conexiones a diferentes motores de base de datos,
-/// diferenciadas por alias.
-/// </summary>
 public class MultiDbConnectionFactory : IDbConnectionFactory
 {
-    private readonly ConcurrentDictionary<string, (string connectionString, DatabaseProvider provider)> _config =
-        new(StringComparer.OrdinalIgnoreCase);
+    private readonly IConnectionResolver _resolver;
 
-    /// <summary>
-    /// Inicializa la fábrica con múltiples alias y motores de base de datos.
-    /// </summary>
-    /// <param name="configurations">Diccionario con alias, cadena de conexión y tipo de proveedor.</param>
-    public MultiDbConnectionFactory(Dictionary<string, (string connectionString, DatabaseProvider provider)> configurations)
+    public MultiDbConnectionFactory(IConnectionResolver resolver)
     {
-        if (configurations == null || configurations.Count == 0)
-            throw new ArgumentException("Debe proporcionar al menos una cadena de conexión.");
-
-        foreach (var kv in configurations)
-            _config[kv.Key] = kv.Value;
+        _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
     }
 
-    /// <summary>
-    /// Crea una nueva conexión basada en el alias especificado.
-    /// </summary>
-    /// <param name="alias">Alias definido en la configuración</param>
-    /// <returns>IDbConnection abierta o lista para usar</returns>
     public IDbConnection CreateConnection(string alias = "MainSql")
     {
-        Console.WriteLine($"[MultiDbConnectionFactory] Alias solicitado: {alias}");
+        var (connectionString, provider) = _resolver.Resolve(alias);
 
-        if (!_config.TryGetValue(alias, out var entry))
-            throw new InvalidOperationException($"No se encontró una configuración para el alias: '{alias}'");
-
-        Console.WriteLine($"[MultiDbConnectionFactory] Provider: {entry.provider}");
-        Console.WriteLine($"[MultiDbConnectionFactory] ConnectionString OK? {!string.IsNullOrEmpty(entry.connectionString)}");
-
-        return entry.provider switch
+        return provider switch
         {
-            DatabaseProvider.SqlServer => new SqlConnection(entry.connectionString),
-            DatabaseProvider.Sybase => new AseConnection(entry.connectionString),
-            _ => throw new NotSupportedException($"Proveedor no soportado: {entry.provider}")
+            DatabaseProvider.SqlServer => new SqlConnection(connectionString),
+            DatabaseProvider.Sybase => new AseConnection(connectionString),
+            _ => throw new NotSupportedException($"Proveedor no soportado: {provider}")
         };
     }
 }
