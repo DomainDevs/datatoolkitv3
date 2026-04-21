@@ -1,19 +1,22 @@
-﻿namespace DataToolkit.Library.Engine.Resilience;
+﻿using DataToolkit.Library.Common;
+
+namespace DataToolkit.Library.Engine.Resilience;
 
 public class RetryPolicy
 {
-    public int MaxRetries { get; }
-    public int BaseDelayMs { get; }
+    private readonly RetryOptions _options;
 
-    public RetryPolicy(int maxRetries = 3, int baseDelayMs = 200)
+    public RetryPolicy(DataToolkitOptions toolkitOptions)
     {
-        MaxRetries = maxRetries;
-        BaseDelayMs = baseDelayMs;
+        _options = toolkitOptions.Retry;
     }
 
     public bool ShouldRetry(Exception ex, int attempt)
     {
-        if (attempt >= MaxRetries)
+        if (!_options.Enabled)
+            return false;
+
+        if (attempt >= _options.MaxRetries)
             return false;
 
         var type = SqlErrorClassifier.Classify(ex);
@@ -23,6 +26,6 @@ public class RetryPolicy
 
     public int GetDelay(int attempt)
     {
-        return BaseDelayMs * (int)Math.Pow(2, attempt); // exponential backoff
+        return _options.BaseDelayMs * (int)Math.Pow(2, attempt);
     }
 }
