@@ -1,7 +1,12 @@
 ﻿using DataToolkit.Library.Common;
+using DataToolkit.Library.Connections;
+using DataToolkit.Library.Connections.Providers;
+using DataToolkit.Library.Engine.Abstractions;
+using DataToolkit.Library.Engine.Core;
 using DataToolkit.Library.Engine.Resilience;
 using DataToolkit.Library.UnitOfWorkLayer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace DataToolkit.Library.Extensions;
 
@@ -11,17 +16,19 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<DataToolkitOptions>? configure = null)
     {
-        var options = new DataToolkitOptions();
+        services.Configure<DataToolkitOptions>(configure ?? (_ => { }));
 
-        configure?.Invoke(options);
+        services.AddSingleton(sp =>
+            sp.GetRequiredService<IOptions<DataToolkitOptions>>().Value);
 
-        services.AddSingleton(options);
+        services.AddScoped<IDbConnectionFactory, SqlServerConnectionFactory>();
 
-        // 🔹 Resiliencia
-        services.AddSingleton<RetryPolicy>();
         services.AddSingleton<IExecutionPolicy, RetryEngine>();
 
-        // 🔹 Core
+        services.AddScoped<ISqlExecutor, SqlExecutor>();
+
+        services.Decorate<ISqlExecutor, ResilientSqlExecutor>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

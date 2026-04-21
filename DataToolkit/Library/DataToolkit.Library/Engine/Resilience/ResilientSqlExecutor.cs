@@ -5,7 +5,7 @@ using System.Data;
 
 namespace DataToolkit.Library.Engine.Resilience;
 
-internal class ResilientSqlExecutor : ISqlExecutor
+internal sealed class ResilientSqlExecutor : ISqlExecutor
 {
     private readonly ISqlExecutor _inner;
     private readonly IExecutionPolicy _policy;
@@ -84,4 +84,6 @@ internal class ResilientSqlExecutor : ISqlExecutor
 
     public void Dispose()
         => _inner.Dispose();
+
+
 }
