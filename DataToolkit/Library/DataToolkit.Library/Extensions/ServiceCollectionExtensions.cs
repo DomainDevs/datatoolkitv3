@@ -16,19 +16,35 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<DataToolkitOptions>? configure = null)
     {
+        // OPTIONS
         services.Configure<DataToolkitOptions>(configure ?? (_ => { }));
 
         services.AddSingleton(sp =>
             sp.GetRequiredService<IOptions<DataToolkitOptions>>().Value);
 
+        // CONNECTIONS
         services.AddScoped<IDbConnectionFactory, SqlServerConnectionFactory>();
 
+        // RETRY POLICY (CORE)
         services.AddSingleton<IExecutionPolicy, RetryEngine>();
 
-        services.AddScoped<ISqlExecutor, SqlExecutor>();
+        // SQL EXECUTOR BASE
+        services.AddScoped<SqlExecutor>();
 
-        services.Decorate<ISqlExecutor, ResilientSqlExecutor>();
+        // RESILIENT DECORATION (MANUAL, SIN SCRUTOR)
+        services.AddScoped<ISqlExecutor>(sp =>
+        {
+            var factory = sp.GetRequiredService<IDbConnectionFactory>();
+            var policy = sp.GetRequiredService<IExecutionPolicy>();
 
+            var connection = factory.CreateConnection("SqlServer");
+
+            var inner = new SqlExecutor(connection, () => null);
+
+            return new ResilientSqlExecutor(inner, policy);
+        });
+
+        // UNIT OF WORK (OWNER DE CONEXIÓN)
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
