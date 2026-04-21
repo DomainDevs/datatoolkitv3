@@ -123,8 +123,6 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         return instance;
     }*/
 
-    // ---------------- INTERNAL CONTROL ----------------
-
     private void ClearTransaction()
     {
         _transaction?.Dispose();
