@@ -1,8 +1,8 @@
-﻿using DataToolkit.Library.Exceptions;
-using DataToolkit.Library.Connections;
+﻿using DataToolkit.Library.Connections;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Core;
-
+using DataToolkit.Library.Exceptions;
+using DataToolkit.Library.Repositories;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System.Data;
@@ -51,6 +51,7 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
     {
         ThrowIfDisposed();
         EnsureOpen();
+
 
         if (_transaction != null)
             throw new InvalidOperationException("Transaction already active.");
@@ -104,24 +105,28 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
     }
 
     // ---------------- REPOSITORY ----------------
-    /*
     public IGenericRepository<T> Repository<T>() where T : class
     {
         ThrowIfDisposed();
 
-        // Guardrail opcional: detecta uso sin transacción
         if (_transaction == null)
-            _logger.Warning("Repository used without active transaction: {Entity}", typeof(T).Name);
+        {
+            _logger.Warning(
+                "Repository access without transaction scope detected: {Entity}",
+                typeof(T).Name);
+        }
 
         if (_repositories.TryGetValue(typeof(T), out var repo))
             return (IGenericRepository<T>)repo;
 
         EnsureOpen();
 
-        var instance = new GenericRepository<T>(_connection, () => _transaction);
+        var instance = new GenericRepository<T>(Sql);
+
         _repositories[typeof(T)] = instance;
+
         return instance;
-    }*/
+    }
 
     private void ClearTransaction()
     {
