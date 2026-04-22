@@ -2,7 +2,7 @@
 
 namespace DataToolkit.Library.Common.Metadata;
 
-public class EntityMetadata
+internal sealed class EntityMetadata
 {
     public string TableName { get; set; }
     public List<PropertyInfo> Properties { get; set; } = new();

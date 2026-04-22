@@ -2,7 +2,7 @@
 
 namespace DataToolkit.Library.ChangeTracking;
 
-public class EntityEntry<T> where T : class
+internal sealed class EntityEntry<T> where T : class
 {
     private readonly Dictionary<string, object?> _originalValues = new();
     private readonly HashSet<string> _modifiedProperties = new();

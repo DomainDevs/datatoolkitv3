@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DataToolkit.Library.Common.Metadata;
 
 
-public static class BuildSql
+internal static class BuildSql
 {
     //Función que toma el sql y un objeto param, para reemplazar los placeholders:
     public static string BuildSqlWithParams(string sql, object parameters)

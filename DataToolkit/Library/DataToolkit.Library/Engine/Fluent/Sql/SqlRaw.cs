@@ -1,3 +1,3 @@
 ﻿namespace DataToolkit.Library.Fluent.Sql;
 
-public sealed record SqlRaw(string Text) : SqlNode;
+internal sealed record SqlRaw(string Text) : SqlNode;

@@ -3,9 +3,9 @@ using DataToolkit.Library.Fluent.Sql;
 
 namespace DataToolkit.Library.Fluent.Parsing;
 
-public static class ExpressionParser
+internal static class ExpressionParser
 {
-    public static SqlNode Parse(Expression expr)
+    internal static SqlNode Parse(Expression expr)
     {
         return expr switch
         {

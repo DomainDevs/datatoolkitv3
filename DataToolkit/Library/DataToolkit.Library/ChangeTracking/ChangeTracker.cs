@@ -1,6 +1,6 @@
 ﻿namespace DataToolkit.Library.ChangeTracking;
 
-public class ChangeTracker : IChangeTracker
+internal sealed class ChangeTracker : IChangeTracker
 {
     private readonly Dictionary<object, object> _entries = new();
 

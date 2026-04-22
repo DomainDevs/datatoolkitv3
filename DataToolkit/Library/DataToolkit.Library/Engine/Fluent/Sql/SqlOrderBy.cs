@@ -1,3 +1,3 @@
 ﻿namespace DataToolkit.Library.Fluent.Sql;
 
-public sealed record SqlOrderBy(List<string> Columns) : SqlNode;
+internal sealed record SqlOrderBy(List<string> Columns) : SqlNode;

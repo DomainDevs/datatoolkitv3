@@ -1,3 +1,3 @@
 ﻿namespace DataToolkit.Library.Fluent.Sql;
 
-public sealed record SqlSelect(List<string> Columns) : SqlNode;
+internal sealed record SqlSelect(List<string> Columns) : SqlNode;

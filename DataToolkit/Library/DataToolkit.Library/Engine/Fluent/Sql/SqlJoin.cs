@@ -1,6 +1,6 @@
 ﻿namespace DataToolkit.Library.Fluent.Sql;
 
-public sealed record SqlJoin(
+internal sealed record SqlJoin(
     string Type,
     string Table,
     string On

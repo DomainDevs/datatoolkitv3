@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DataToolkit.Library.Common.Metadata;
 
-public static class EntityMetadataHelper
+internal static class EntityMetadataHelper
 {
     private static readonly ConcurrentDictionary<Type, EntityMetadata> _metadataCache = new();
 
