@@ -109,7 +109,9 @@ public sealed class FluentQuery : IFluentQuery
         if (_built)
             return (_cachedSql!, _parameters);
 
-        _cachedSql = new SqlCompiler().Compile(this);
+        var compiler = new SqlCompiler();
+
+        _cachedSql = compiler.Compile(_nodes); // ✅ FIX REAL AQUÍ
         _built = true;
 
         return (_cachedSql, _parameters);

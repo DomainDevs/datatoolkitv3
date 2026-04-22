@@ -5,77 +5,109 @@ namespace DataToolkit.Library.Fluent.Compilation;
 
 internal sealed class SqlCompiler
 {
-    public string Compile(FluentQuery q)
+    private readonly SqlTrace? _trace;
+
+    public SqlCompiler(SqlTrace? trace = null)
     {
+        _trace = trace;
+    }
+
+    public string Compile(IEnumerable<SqlNode> nodes)
+    {
+        var nodeList = nodes.ToList();
         var sb = new StringBuilder();
 
+        Log("[BEGIN] SQL COMPILATION");
+
         // ---------------- SELECT ----------------
-        var select = q.Nodes.OfType<SqlSelect>().FirstOrDefault();
-        sb.Append("SELECT ");
-        sb.Append(select is null || select.Columns.Count == 0
+        var select = nodeList.OfType<SqlSelect>().FirstOrDefault();
+
+        var selectSql = select is null || select.Columns.Count == 0
             ? "*"
-            : string.Join(", ", select.Columns));
-        sb.AppendLine();
+            : string.Join(", ", select.Columns);
+
+        Log($"[SELECT] {selectSql}");
+
+        sb.Append("SELECT ").Append(selectSql).AppendLine();
 
         // ---------------- FROM ----------------
-        var from = q.Nodes.OfType<SqlFrom>().FirstOrDefault();
-        sb.Append("FROM ");
-        sb.Append(from is null
-            ? ""
-            : string.Join(", ", from.Tables));
-        sb.AppendLine();
+        var from = nodeList.OfType<SqlFrom>().FirstOrDefault();
+
+        if (from is null)
+            throw new InvalidOperationException("FROM clause is required");
+
+        var fromSql = string.Join(", ", from.Tables);
+
+        Log($"[FROM] {fromSql}");
+
+        sb.Append("FROM ")
+          .Append(fromSql)
+          .AppendLine();
 
         // ---------------- JOIN ----------------
-        foreach (var join in q.Nodes.OfType<SqlJoin>())
+        var joins = nodeList.OfType<SqlJoin>().ToList();
+
+        Log($"[JOIN] COUNT={joins.Count}");
+
+        foreach (var join in joins)
         {
-            sb.Append(join.Type);
-            sb.Append(" ");
-            sb.Append(join.Table);
-            sb.Append(" ON ");
-            sb.Append(join.On);
-            sb.AppendLine();
+            Log($"[JOIN] {join.Type} {join.Table} ON {join.On}");
+
+            sb.Append(join.Type)
+              .Append(" ")
+              .Append(join.Table)
+              .Append(" ON ")
+              .Append(join.On)
+              .AppendLine();
         }
 
-        // ---------------- WHERE ----------------
-        var whereNodes = q.Nodes
-            .Where(n => n is SqlRaw || n is SqlBinary)
-            .ToList();
+        // ---------------- WHERE (CORRECTO) ----------------
+        var where = nodeList.OfType<SqlWhere>().FirstOrDefault();
 
-        if (whereNodes.Count > 0)
+        if (where is not null)
         {
+            Log("[WHERE] EXISTS");
+
             sb.Append("WHERE ");
 
-            for (int i = 0; i < whereNodes.Count; i++)
-            {
-                if (i > 0)
-                    sb.Append(" AND ");
-
-                Render(sb, whereNodes[i]);
-            }
+            Render(sb, where.Expression);
 
             sb.AppendLine();
         }
 
         // ---------------- GROUP BY ----------------
-        var groupBy = q.Nodes.OfType<SqlGroupBy>().FirstOrDefault();
+        var groupBy = nodeList.OfType<SqlGroupBy>().FirstOrDefault();
 
         if (groupBy is not null && groupBy.Columns.Count > 0)
         {
-            sb.Append("GROUP BY ");
-            sb.Append(string.Join(", ", groupBy.Columns));
-            sb.AppendLine();
+            var gb = string.Join(", ", groupBy.Columns);
+
+            Log($"[GROUP BY] {gb}");
+
+            sb.Append("GROUP BY ")
+              .Append(gb)
+              .AppendLine();
         }
 
         // ---------------- ORDER BY ----------------
-        var orderBy = q.Nodes.OfType<SqlOrderBy>().FirstOrDefault();
+        var orderBy = nodeList.OfType<SqlOrderBy>().FirstOrDefault();
 
         if (orderBy is not null && orderBy.Columns.Count > 0)
         {
-            sb.Append("ORDER BY ");
-            sb.Append(string.Join(", ", orderBy.Columns));
+            var ob = string.Join(", ", orderBy.Columns);
+
+            Log($"[ORDER BY] {ob}");
+
+            sb.Append("ORDER BY ")
+              .Append(ob);
         }
 
-        return sb.ToString().Trim();
+        var sql = sb.ToString().Trim();
+
+        Log("[END] SQL COMPILATION");
+        Log($"[SQL] {sql}");
+
+        return sql;
     }
 
     private void Render(StringBuilder sb, SqlNode node)
@@ -83,16 +115,28 @@ internal sealed class SqlCompiler
         switch (node)
         {
             case SqlRaw r:
+                Log($"[RAW] {r.Text}");
                 sb.Append(r.Text);
                 break;
 
             case SqlBinary b:
+                Log($"[BINARY] {b.Op}");
+
                 sb.Append("(");
                 Render(sb, b.Left);
                 sb.Append(" ").Append(b.Op).Append(" ");
                 Render(sb, b.Right);
                 sb.Append(")");
                 break;
+
+            case SqlWhere w:
+                Render(sb, w.Expression);
+                break;
         }
+    }
+
+    private void Log(string message)
+    {
+        _trace?.Add(message);
     }
 }
