@@ -11,7 +11,7 @@ namespace DataToolkit.Library.Engine.Core;
 /// Ejecuta consultas SQL y procedimientos almacenados usando Dapper,
 /// con soporte para interpolación, multi-mapping, multi-result y OUTPUT.
 /// </summary>
-public class SqlExecutor : ISqlExecutor, IDisposable
+internal class SqlExecutor : ISqlExecutor, IDisposable
 {
     private readonly IDbConnection _connection;                     //Recibir referencia de conexión
     private readonly Func<IDbTransaction?> _transactionProvider;
@@ -21,7 +21,7 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     private bool _disposed;
 
     // ---------------- CONSTRUCTOR COMPATIBLE (LEGACY) ----------------
-    public SqlExecutor(
+    internal SqlExecutor(
         IDbConnection connection,
         IDbTransaction? transaction = null,
         int? commandTimeout = null,
@@ -37,7 +37,7 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     }
 
     // ---------------- CONSTRUCTOR MODERNO (RECOMENDADO) ----------------
-    public SqlExecutor(
+    internal SqlExecutor(
         IDbConnection connection,
         Func<IDbTransaction?> transactionProvider,
         int? commandTimeout = null,
@@ -372,8 +372,6 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-
-        //_connection?.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);
     }
