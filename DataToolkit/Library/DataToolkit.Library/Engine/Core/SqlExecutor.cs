@@ -13,7 +13,7 @@ namespace DataToolkit.Library.Engine.Core;
 /// </summary>
 public class SqlExecutor : ISqlExecutor, IDisposable
 {
-    private readonly IDbConnection _connection;
+    private readonly IDbConnection _connection;                     //Recibir referencia de conexión
     private readonly Func<IDbTransaction?> _transactionProvider;
     private readonly int? _defaultTimeout;
     private readonly ILogger _logger;
@@ -373,7 +373,7 @@ public class SqlExecutor : ISqlExecutor, IDisposable
     {
         if (_disposed) return;
 
-        _connection?.Dispose();
+        //_connection?.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);
     }
