@@ -25,9 +25,9 @@ namespace DataToolkit.Library.Engine.Abstractions
         IEnumerable<T> FromSqlInterpolated<T>(FormattableString query);
         IEnumerable<T> FromSqlInterpolated<T>(FormattableString query, int? commandTimeout = null);
         Task<IEnumerable<T>> FromSqlInterpolatedAsync<T>(FormattableString query, int? commandTimeout = null, CancellationToken ct = default);
-        IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest request);
-        IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest request, int? commandTimeout = null);
-        Task<IEnumerable<T>> FromSqlMultiMapAsync<T>(MultiMapRequest request, int? commandTimeout = null);
+        IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest<T> request);
+        IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest<T> request, int? commandTimeout = null);
+        Task<IEnumerable<T>> FromSqlMultiMapAsync<T>(MultiMapRequest<T> request, int? commandTimeout = null);
         Task<List<IEnumerable<dynamic>>> QueryMultipleAsync(string sql, object? parameters = null, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null);
     }
 }

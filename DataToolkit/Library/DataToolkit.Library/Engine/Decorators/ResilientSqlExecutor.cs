@@ -2,7 +2,7 @@
 
 namespace DataToolkit.Library.Engine.Decorators;
 
-internal sealed class ResilientSqlExecutor : ISqlExecutor
+internal sealed class ResilientSqlExecutor
 {
     private readonly ISqlExecutor _inner;
     private readonly RetryExecutor _retry;

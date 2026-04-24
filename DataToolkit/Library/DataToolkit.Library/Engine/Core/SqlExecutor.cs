@@ -154,10 +154,10 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     // MULTI MAP
     // =========================================================
 
-    public IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest request)
+    public IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest<T> request)
         => FromSqlMultiMap<T>(request, null);
 
-    public IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest request, int? commandTimeout = null)
+    public IEnumerable<T> FromSqlMultiMap<T>(MultiMapRequest<T> request, int? commandTimeout = null)
     {
         return ExecuteSafe(() =>
         {
@@ -166,7 +166,7 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
             var result = conn.Query(
                 request.Sql,
                 request.Types,
-                objects => request.MapFunction(objects),
+                (object[] objects) => request.MapFunction(objects),
                 param: request.Parameters,
                 splitOn: request.SplitOn,
                 transaction: Tx,
@@ -179,7 +179,7 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     }
 
     public async Task<IEnumerable<T>> FromSqlMultiMapAsync<T>(
-        MultiMapRequest request,
+        MultiMapRequest<T> request,
         int? commandTimeout = null)
     {
         return await ExecuteSafeAsync(async () =>

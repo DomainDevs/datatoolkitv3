@@ -7,11 +7,16 @@
 /// <param MapFunction="">Función que construye el objeto final</param>
 /// <returns></returns>
 /// </summary>
-public class MultiMapRequest
+public class MultiMapRequest<T>
 {
-    public string? Sql { get; set; } = null;
-    public object? Parameters { get; set; } = null;
+    public string Sql { get; set; } = string.Empty;
+
+    public object? Parameters { get; set; }
+
     public string SplitOn { get; set; } = "Id";
-    public Type[]? Types { get; set; } = null;
-    public Func<object[], object> MapFunction { get; set; }
+
+    public Type[] Types { get; set; } = Array.Empty<Type>();
+
+    // ✔ ahora es tipado correcto
+    public Func<object[], T> MapFunction { get; set; } = default!;
 }
