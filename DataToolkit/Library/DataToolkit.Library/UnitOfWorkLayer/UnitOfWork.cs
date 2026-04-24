@@ -1,62 +1,88 @@
 ﻿using DataToolkit.Library.Connections;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Core;
-using DataToolkit.Library.Exceptions;
 using DataToolkit.Library.Repositories;
-using Microsoft.Extensions.Options;
 using Serilog;
 using System.Data;
-
 
 namespace DataToolkit.Library.UnitOfWorkLayer;
 
 public sealed class UnitOfWork : IUnitOfWork, IDisposable
 {
-    private readonly IDbConnection _connection;
-    private IDbTransaction? _transaction;
-    private readonly ILogger _logger = Log.ForContext<UnitOfWork>();
-    private readonly bool _disposeConnection;
-    private bool _disposed;
+    private readonly IDbConnectionFactory _factory;
+    private readonly string _dbAlias;
 
+    private IDbConnection? _connection;
+    private IDbTransaction? _transaction;
+
+    private readonly ILogger _logger = Log.ForContext<UnitOfWork>();
     private readonly Dictionary<Type, object> _repositories = new();
 
-    /// <summary>
-    /// Only infrastructure-level access. Do not use in application layer.
-    /// </summary>
-    internal IDbConnection Connection => _connection;
+    private bool _disposed;
+
     public IDbTransaction? Transaction => _transaction;
+    public bool HasActiveTransaction => _transaction != null;
 
     public ISqlExecutor Sql { get; }
 
-    public bool HasActiveTransaction => _transaction != null;
-
     public UnitOfWork(
         IDbConnectionFactory factory,
-        string dbAlias = "SqlServer",
-        bool disposeConnection = false)
+        string dbAlias = "SqlServer")
     {
-        _connection = factory.CreateConnection(dbAlias)
-            ?? throw new InvalidOperationException("Connection factory returned null.");
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        _dbAlias = dbAlias;
 
-        _disposeConnection = disposeConnection;
-
-        EnsureOpen();
-
-        Sql = new SqlExecutor(_connection, () => _transaction);
+        // ❗ Connection is created but NOT opened here (lazy ownership rule)
+        Sql = new SqlExecutor(
+            GetConnection,
+            GetTransaction);
     }
 
-    // ---------------- TRANSACTION SAFETY ----------------
+    // =========================================================
+    // SINGLE OWNERSHIP: CONNECTION CONTROLLED ONLY HERE
+    // =========================================================
+
+    private IDbConnection GetConnection()
+    {
+        ThrowIfDisposed();
+
+        if (_connection == null)
+        {
+            _connection = _factory.CreateConnection(_dbAlias)
+                ?? throw new InvalidOperationException("Connection factory returned null.");
+        }
+
+        EnsureOpen();
+        return _connection;
+    }
+
+    private IDbTransaction? GetTransaction() => _transaction;
+
+    private void EnsureOpen()
+    {
+        if (_connection == null) return;
+
+        if (_connection.State == ConnectionState.Broken)
+            throw new InvalidOperationException("Connection is broken.");
+
+        if (_connection.State == ConnectionState.Closed)
+            _connection.Open();
+    }
+
+    // =========================================================
+    // TRANSACTIONS
+    // =========================================================
 
     public void BeginTransaction()
     {
         ThrowIfDisposed();
-        EnsureOpen();
 
+        var conn = GetConnection();
 
         if (_transaction != null)
             throw new InvalidOperationException("Transaction already active.");
 
-        _transaction = _connection.BeginTransaction();
+        _transaction = conn.BeginTransaction();
         _repositories.Clear();
     }
 
@@ -70,11 +96,6 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         try
         {
             _transaction.Commit();
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "Commit failed");
-            throw;
         }
         finally
         {
@@ -93,39 +114,10 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         {
             _transaction.Rollback();
         }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "Rollback failed");
-            throw;
-        }
         finally
         {
             ClearTransaction();
         }
-    }
-
-    // ---------------- REPOSITORY ----------------
-    public IGenericRepository<T> Repository<T>() where T : class
-    {
-        ThrowIfDisposed();
-
-        if (_transaction == null)
-        {
-            _logger.Warning(
-                "Repository access without transaction scope detected: {Entity}",
-                typeof(T).Name);
-        }
-
-        if (_repositories.TryGetValue(typeof(T), out var repo))
-            return (IGenericRepository<T>)repo;
-
-        EnsureOpen();
-
-        var instance = new GenericRepository<T>(Sql);
-
-        _repositories[typeof(T)] = instance;
-
-        return instance;
     }
 
     private void ClearTransaction()
@@ -135,14 +127,27 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         _repositories.Clear();
     }
 
-    private void EnsureOpen()
-    {
-        if (_connection.State == ConnectionState.Broken)
-            throw new InvalidOperationException("Connection is broken.");
+    // =========================================================
+    // REPOSITORIES
+    // =========================================================
 
-        if (_disposeConnection && _connection.State != ConnectionState.Closed)
-            _connection.Open();
+    public IGenericRepository<T> Repository<T>() where T : class
+    {
+        ThrowIfDisposed();
+
+        if (_repositories.TryGetValue(typeof(T), out var repo))
+            return (IGenericRepository<T>)repo;
+
+        var instance = new GenericRepository<T>(Sql);
+        //_repositories[typeof(T)] = instance;
+        _repositories.TryAdd(typeof(T), instance);
+
+        return instance;
     }
+
+    // =========================================================
+    // SAFETY
+    // =========================================================
 
     private void ThrowIfDisposed()
     {
@@ -150,7 +155,9 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
             throw new ObjectDisposedException(nameof(UnitOfWork));
     }
 
-    // ---------------- DISPOSE (SAFE + CONTROLLED) ----------------
+    // =========================================================
+    // DISPOSE (OWNERSHIP RULE)
+    // =========================================================
 
     public void Dispose()
     {
@@ -159,9 +166,9 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         try
         {
             _transaction?.Dispose();
-
-            if (_disposeConnection && _connection.State != ConnectionState.Closed)
-                _connection.Dispose();
+            
+            _connection?.Dispose();
+            _connection = null;
 
             _repositories.Clear();
         }

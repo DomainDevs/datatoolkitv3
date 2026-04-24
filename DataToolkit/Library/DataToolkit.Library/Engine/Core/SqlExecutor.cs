@@ -13,40 +13,22 @@ namespace DataToolkit.Library.Engine.Core;
 /// </summary>
 internal class SqlExecutor : ISqlExecutor, IDisposable
 {
-    private readonly IDbConnection _connection;                     //Recibir referencia de conexión
+    private readonly Func<IDbConnection> _connectionFactory;
     private readonly Func<IDbTransaction?> _transactionProvider;
     private readonly int? _defaultTimeout;
     private readonly ILogger _logger;
 
     private bool _disposed;
 
-    // ---------------- CONSTRUCTOR COMPATIBLE (LEGACY) ----------------
+    // ---------------- CONSTRUCTOR MODERNO (UNIT OF WORK LAZY) ----------------
     internal SqlExecutor(
-        IDbConnection connection,
-        IDbTransaction? transaction = null,
-        int? commandTimeout = null,
-        ILogger? logger = null)
-    {
-        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
-        // backward compatible (snapshot mode)
-        _transactionProvider = () => transaction;
-
-        _defaultTimeout = commandTimeout;
-        _logger = logger ?? Log.Logger;
-    }
-
-    // ---------------- CONSTRUCTOR MODERNO (RECOMENDADO) ----------------
-    internal SqlExecutor(
-        IDbConnection connection,
+        Func<IDbConnection> connectionFactory,
         Func<IDbTransaction?> transactionProvider,
         int? commandTimeout = null,
         ILogger? logger = null)
     {
-        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
-        _transactionProvider = transactionProvider ?? (() => null); //proteger paso de null
-
+        _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+        _transactionProvider = transactionProvider ?? (() => null);
         _defaultTimeout = commandTimeout;
         _logger = logger ?? Log.Logger;
     }
@@ -54,50 +36,27 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     // =========================================================
     // CORE HELPERS
     // =========================================================
+
+    private IDbConnection Connection => _connectionFactory();
     private IDbTransaction? Tx => _transactionProvider();
+
+    private IDbConnection GetOpenConnection()
+    {
+        var conn = Connection;
+
+        if (conn.State == ConnectionState.Broken)
+            throw new InvalidOperationException("Connection is broken.");
+
+        if (conn.State == ConnectionState.Closed)
+            conn.Open();
+
+        return conn;
+    }
 
     private void ValidateSql(string sql)
     {
         if (string.IsNullOrWhiteSpace(sql))
             throw new ArgumentException("SQL cannot be null or empty.");
-    }
-
-    // =========================================================
-    // SQL INTERPOLATED
-    // =========================================================
-
-    public IEnumerable<T> FromSqlInterpolated<T>(FormattableString query)
-        => FromSqlInterpolated<T>(query, null);
-
-    public IEnumerable<T> FromSqlInterpolated<T>(FormattableString query, int? commandTimeout = null)
-    {
-        var (sql, parameters) = BuildInterpolatedSql(query);
-
-        return ExecuteSafe(() =>
-            _connection.Query<T>(
-                sql,
-                parameters,
-                Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout),
-            sql);
-    }
-
-    public async Task<IEnumerable<T>> FromSqlInterpolatedAsync<T>(
-        FormattableString query,
-        int? commandTimeout = null,
-        CancellationToken ct = default)
-    {
-        var (sql, parameters) = BuildInterpolatedSql(query);
-
-        return await ExecuteSafeAsync(async () =>
-            await _connection.QueryAsync<T>(
-                new CommandDefinition(
-                    sql,
-                    parameters,
-                    Tx,
-                    commandTimeout ?? _defaultTimeout,
-                    cancellationToken: ct)),
-            sql);
     }
 
     // =========================================================
@@ -113,32 +72,82 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     public IEnumerable<T> FromSql<T>(string sql, object? parameters = null, int? commandTimeout = null)
     {
         return ExecuteSafe(() =>
-            _connection.Query<T>(
+        {
+            var conn = GetOpenConnection();
+
+            return conn.Query<T>(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout),
-            sql);
+                commandTimeout: commandTimeout ?? _defaultTimeout);
+        }, sql);
     }
 
-    public Task<IEnumerable<T>> FromSqlAsync<T>(string sql)
-        => FromSqlAsync<T>(sql, null, null);
+    public async Task<IEnumerable<T>> FromSqlAsync<T>(string sql)
+        => await FromSqlAsync<T>(sql, null, null);
 
-    public Task<IEnumerable<T>> FromSqlAsync<T>(string sql, object? parameters)
-        => FromSqlAsync<T>(sql, parameters, null);
+    public async Task<IEnumerable<T>> FromSqlAsync<T>(string sql, object? parameters)
+        => await FromSqlAsync<T>(sql, parameters, null);
 
     public async Task<IEnumerable<T>> FromSqlAsync<T>(
         string sql,
         object? parameters = null,
         int? commandTimeout = null)
     {
-        return await ExecuteSafeAsync(() =>
-            _connection.QueryAsync<T>(
+        return await ExecuteSafeAsync(async () =>
+        {
+            var conn = GetOpenConnection();
+
+            return await conn.QueryAsync<T>(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout),
-            sql);
+                commandTimeout: commandTimeout ?? _defaultTimeout);
+        }, sql);
+    }
+
+    // =========================================================
+    // INTERPOLATED SQL
+    // =========================================================
+
+    public IEnumerable<T> FromSqlInterpolated<T>(FormattableString query)
+        => FromSqlInterpolated<T>(query, null);
+
+    public IEnumerable<T> FromSqlInterpolated<T>(FormattableString query, int? commandTimeout = null)
+    {
+        var (sql, parameters) = BuildInterpolatedSql(query);
+
+        return ExecuteSafe(() =>
+        {
+            var conn = GetOpenConnection();
+
+            return conn.Query<T>(
+                sql,
+                parameters,
+                Tx,
+                commandTimeout: commandTimeout ?? _defaultTimeout);
+        }, sql);
+    }
+
+    public async Task<IEnumerable<T>> FromSqlInterpolatedAsync<T>(
+        FormattableString query,
+        int? commandTimeout = null,
+        CancellationToken ct = default)
+    {
+        var (sql, parameters) = BuildInterpolatedSql(query);
+
+        return await ExecuteSafeAsync(async () =>
+        {
+            var conn = GetOpenConnection();
+
+            return await conn.QueryAsync<T>(
+                new CommandDefinition(
+                    sql,
+                    parameters,
+                    Tx,
+                    commandTimeout ?? _defaultTimeout,
+                    cancellationToken: ct));
+        }, sql);
     }
 
     // =========================================================
@@ -152,7 +161,9 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     {
         return ExecuteSafe(() =>
         {
-            var result = _connection.Query(
+            var conn = GetOpenConnection();
+
+            var result = conn.Query(
                 request.Sql,
                 request.Types,
                 objects => request.MapFunction(objects),
@@ -173,7 +184,9 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     {
         return await ExecuteSafeAsync(async () =>
         {
-            var result = await _connection.QueryAsync(
+            var conn = GetOpenConnection();
+
+            var result = await conn.QueryAsync(
                 request.Sql,
                 request.Types,
                 objects => request.MapFunction(objects),
@@ -200,9 +213,11 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     {
         return await ExecuteSafeAsync(async () =>
         {
+            var conn = GetOpenConnection();
+
             var resultSets = new List<IEnumerable<dynamic>>();
 
-            using var reader = await _connection.QueryMultipleAsync(
+            using var reader = await conn.QueryMultipleAsync(
                 sql,
                 parameters,
                 Tx,
@@ -229,32 +244,38 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     public int Execute(string sql, object? parameters = null, int? commandTimeout = null)
     {
         return ExecuteSafe(() =>
-            _connection.Execute(
+        {
+            var conn = GetOpenConnection();
+
+            return conn.Execute(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout),
-            sql);
+                commandTimeout: commandTimeout ?? _defaultTimeout);
+        }, sql);
     }
 
-    public Task<int> ExecuteAsync(string sql)
-        => ExecuteAsync(sql, null, null);
+    public async Task<int> ExecuteAsync(string sql)
+        => await ExecuteAsync(sql, null, null);
 
-    public Task<int> ExecuteAsync(string sql, object? parameters)
-        => ExecuteAsync(sql, parameters, null);
+    public async Task<int> ExecuteAsync(string sql, object? parameters)
+        => await ExecuteAsync(sql, parameters, null);
 
     public async Task<int> ExecuteAsync(
         string sql,
         object? parameters = null,
         int? commandTimeout = null)
     {
-        return await ExecuteSafeAsync(() =>
-            _connection.ExecuteAsync(
+        return await ExecuteSafeAsync(async () =>
+        {
+            var conn = GetOpenConnection();
+
+            return await conn.ExecuteAsync(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout),
-            sql);
+                commandTimeout: commandTimeout ?? _defaultTimeout);
+        }, sql);
     }
 
     // =========================================================
@@ -273,10 +294,12 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     {
         return ExecuteSafe(() =>
         {
+            var conn = GetOpenConnection();
+
             var parameters = new DynamicParameters();
             configureParameters(parameters);
 
-            var rows = _connection.Execute(
+            var rows = conn.Execute(
                 storedProcedure,
                 parameters,
                 Tx,
@@ -300,10 +323,12 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     {
         return await ExecuteSafeAsync(async () =>
         {
+            var conn = GetOpenConnection();
+
             var parameters = new DynamicParameters();
             configureParameters(parameters);
 
-            var rows = await _connection.ExecuteAsync(
+            var rows = await conn.ExecuteAsync(
                 storedProcedure,
                 parameters,
                 Tx,
@@ -339,6 +364,7 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
 
     private T ExecuteSafe<T>(Func<T> func, string sql)
     {
+        ThrowIfDisposed();
         try
         {
             ValidateSql(sql);
@@ -346,13 +372,15 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "SQL execution error: {Sql}", sql);
+            //_logger.Error(ex, "SQL execution error: {Sql}", sql);
+            _logger.Error(ex,"SQL execution error. Length: {Length}",sql?.Length);
             throw new SqlExecutorException(sql, ex);
         }
     }
 
     private async Task<T> ExecuteSafeAsync<T>(Func<Task<T>> func, string sql)
     {
+        ThrowIfDisposed();
         try
         {
             ValidateSql(sql);
@@ -375,4 +403,11 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         _disposed = true;
         GC.SuppressFinalize(this);
     }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(SqlExecutor));
+    }
+
 }
