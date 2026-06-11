@@ -92,17 +92,19 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     public async Task<IEnumerable<T>> FromSqlAsync<T>(
         string sql,
         object? parameters = null,
-        int? commandTimeout = null)
+        int? commandTimeout = null,
+        CancellationToken ct = default) // <-- Agregar token
     {
         return await ExecuteSafeAsync(async () =>
         {
             var conn = GetOpenConnection();
 
-            return await conn.QueryAsync<T>(
+            return await conn.QueryAsync<T>(new CommandDefinition(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout);
+                commandTimeout ?? _defaultTimeout,
+                cancellationToken: ct)); // <-- Pasar a Dapper
         }, sql);
     }
 
@@ -264,17 +266,19 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     public async Task<int> ExecuteAsync(
         string sql,
         object? parameters = null,
-        int? commandTimeout = null)
+        int? commandTimeout = null,
+        CancellationToken ct = default) // <-- Agregar token
     {
         return await ExecuteSafeAsync(async () =>
         {
             var conn = GetOpenConnection();
 
-            return await conn.ExecuteAsync(
+            return await conn.ExecuteAsync(new CommandDefinition(
                 sql,
                 parameters,
                 Tx,
-                commandTimeout: commandTimeout ?? _defaultTimeout);
+                commandTimeout ?? _defaultTimeout,
+                cancellationToken: ct)); // <-- Pasar a Dapper
         }, sql);
     }
 
@@ -372,9 +376,11 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         }
         catch (Exception ex)
         {
-            //_logger.Error(ex, "SQL execution error: {Sql}", sql);
-            _logger.Error(ex,"SQL execution error. Length: {Length}",sql?.Length);
-            throw new SqlExecutorException(sql, ex);
+            // 1. Logueo seguro sin exponer parámetros o la consulta completa
+            _logger.Error(ex, "SQL execution error. Query Length: {Length}", sql?.Length ?? 0);
+
+            // 2. Pasamos solo la longitud o un mensaje genérico para que el middleware global tampoco filtre el SQL
+            throw new SqlExecutorException($"SQL execution error (Length: {sql?.Length ?? 0})", ex);
         }
     }
 
@@ -388,8 +394,10 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "SQL async execution error: {Sql}", sql);
-            throw new SqlExecutorException(sql, ex);
+            // Corregido para que sea consistente con la versión sincrónica
+            _logger.Error(ex, "SQL async execution error. Query Length: {Length}", sql?.Length ?? 0);
+
+            throw new SqlExecutorException($"SQL async execution error (Length: {sql?.Length ?? 0})", ex);
         }
     }
 

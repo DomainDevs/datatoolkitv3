@@ -11,7 +11,7 @@ namespace DataToolkit.Library.Engine.Abstractions
         int Execute(string sql, object? parameters = null, int? commandTimeout = null);
         int Execute(string sql, object? parameters);
         Task<int> ExecuteAsync(string sql);
-        Task<int> ExecuteAsync(string sql, object? parameters = null, int? commandTimeout = null);
+        Task<int> ExecuteAsync(string sql, object? parameters = null, int? commandTimeout = null, CancellationToken ct = default);
         Task<int> ExecuteAsync(string sql, object? parameters);
         (int RowsAffected, Dictionary<string, object> OutputValues) ExecuteWithOutput(string storedProcedure, Action<DynamicParameters> configureParameters);
         (int RowsAffected, Dictionary<string, object> OutputValues) ExecuteWithOutput(string storedProcedure, Action<DynamicParameters> configureParameters, int? commandTimeout = null);
@@ -20,7 +20,7 @@ namespace DataToolkit.Library.Engine.Abstractions
         IEnumerable<T> FromSql<T>(string sql, object? parameters = null, int? commandTimeout = null);
         IEnumerable<T> FromSql<T>(string sql, object? parameters);
         Task<IEnumerable<T>> FromSqlAsync<T>(string sql);
-        Task<IEnumerable<T>> FromSqlAsync<T>(string sql, object? parameters = null, int? commandTimeout = null);
+        Task<IEnumerable<T>> FromSqlAsync<T>(string sql, object? parameters = null, int? commandTimeout = null, CancellationToken ct = default);
         Task<IEnumerable<T>> FromSqlAsync<T>(string sql, object? parameters);
         IEnumerable<T> FromSqlInterpolated<T>(FormattableString query);
         IEnumerable<T> FromSqlInterpolated<T>(FormattableString query, int? commandTimeout = null);
