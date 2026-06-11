@@ -1,9 +1,10 @@
-﻿using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using DataToolkit.Library.Engine.Fluent.Sql;
+using DataToolkit.Library.Fluent.Compilation;
 using DataToolkit.Library.Fluent.Parsing;
 using DataToolkit.Library.Fluent.Sql;
-using DataToolkit.Library.Fluent.Compilation;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DataToolkit.Library.Fluent;
 
@@ -141,6 +142,32 @@ public sealed class FluentQuery : IFluentQuery
             _parameters[key] = p.GetValue(parameters);
         }
     }
+    // ---------------- SKIP & TAKE  ----------------
+    public IFluentQuery Skip(int rows)
+    {
+        EnsureNotBuilt();
+
+        if (rows < 0)
+            throw new ArgumentOutOfRangeException(nameof(rows));
+
+        _nodes.Add(
+            new SqlSkip(rows));
+
+        return this;
+    }
+    public IFluentQuery Take(int rows)
+    {
+        EnsureNotBuilt();
+
+        if (rows <= 0)
+            throw new ArgumentOutOfRangeException(nameof(rows));
+
+        _nodes.Add(
+            new SqlTake(rows));
+
+        return this;
+    }
+
 
     private void EnsureNotBuilt()
     {

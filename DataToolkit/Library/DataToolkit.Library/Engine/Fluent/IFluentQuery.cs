@@ -11,8 +11,10 @@
         IFluentQuery OrderBy(params string[] columns);
         IFluentQuery RightJoin(string table, string on);
         IFluentQuery Select(params string[] columns);
-        string ToSql();
+        IFluentQuery Skip(int rows);
+        IFluentQuery Take(int rows);
         IFluentQuery Where(string sql, object? parameters = null);
         IFluentQuery WhereIf(bool condition, string sql, object? parameters = null);
+        string ToSql();
     }
 }

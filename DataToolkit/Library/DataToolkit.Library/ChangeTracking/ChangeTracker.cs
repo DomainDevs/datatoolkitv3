@@ -17,4 +17,9 @@ internal sealed class ChangeTracker : IChangeTracker
             : null;
 
     public IReadOnlyCollection<object> TrackedEntities => _entries.Keys.ToList();
+
+    public void Clear()
+    {
+        _entries.Clear();
+    }
 }
