@@ -1,4 +1,5 @@
 ﻿using DataToolkit.Library.Engine.Abstractions;
+using DataToolkit.Library.Repositories;
 using System.Data;
 
 namespace DataToolkit.Library.UnitOfWorkLayer
@@ -9,10 +10,13 @@ namespace DataToolkit.Library.UnitOfWorkLayer
         ISqlExecutor Sql { get; }
         IDbTransaction? Transaction { get; }
 
+        IGenericRepository<T> Repository<T>()
+            where T : class;
+
         void BeginTransaction();
         void Commit();
-        void Dispose();
-        //IGenericRepository<T> Repository<T>() where T : class;
         void Rollback();
+        void Dispose();
+        
     }
 }
