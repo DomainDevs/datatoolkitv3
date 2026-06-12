@@ -1,6 +1,4 @@
-﻿using DataToolkit.Library.Fluent.Sql;
-
-namespace DataToolkit.Library.Engine.Fluent.Sql;
+﻿namespace DataToolkit.Library.Fluent.Sql;
 
 internal sealed record SqlSkip(int Value)
     : SqlNode;

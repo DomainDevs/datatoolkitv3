@@ -28,13 +28,16 @@ internal sealed class SqlCompiler
 
         Log($"[SELECT] {selectSql}");
 
-        sb.Append("SELECT ").Append(selectSql).AppendLine();
+        sb.Append("SELECT ")
+          .Append(selectSql)
+          .AppendLine();
 
         // ---------------- FROM ----------------
         var from = nodeList.OfType<SqlFrom>().FirstOrDefault();
 
         if (from is null)
-            throw new InvalidOperationException("FROM clause is required");
+            throw new InvalidOperationException(
+                "FROM clause is required");
 
         var fromSql = string.Join(", ", from.Tables);
 
@@ -61,7 +64,7 @@ internal sealed class SqlCompiler
               .AppendLine();
         }
 
-        // ---------------- WHERE (CORRECTO) ----------------
+        // ---------------- WHERE ----------------
         var where = nodeList.OfType<SqlWhere>().FirstOrDefault();
 
         if (where is not null)
@@ -78,7 +81,8 @@ internal sealed class SqlCompiler
         // ---------------- GROUP BY ----------------
         var groupBy = nodeList.OfType<SqlGroupBy>().FirstOrDefault();
 
-        if (groupBy is not null && groupBy.Columns.Count > 0)
+        if (groupBy is not null &&
+            groupBy.Columns.Count > 0)
         {
             var gb = string.Join(", ", groupBy.Columns);
 
@@ -92,7 +96,8 @@ internal sealed class SqlCompiler
         // ---------------- ORDER BY ----------------
         var orderBy = nodeList.OfType<SqlOrderBy>().FirstOrDefault();
 
-        if (orderBy is not null && orderBy.Columns.Count > 0)
+        if (orderBy is not null &&
+            orderBy.Columns.Count > 0)
         {
             var ob = string.Join(", ", orderBy.Columns);
 
@@ -100,6 +105,38 @@ internal sealed class SqlCompiler
 
             sb.Append("ORDER BY ")
               .Append(ob);
+        }
+
+        // ---------------- PAGING ----------------
+        var skip = nodeList
+            .OfType<SqlSkip>()
+            .FirstOrDefault();
+
+        var take = nodeList
+            .OfType<SqlTake>()
+            .FirstOrDefault();
+
+        if ((skip is not null || take is not null)
+            && orderBy is null)
+        {
+            throw new InvalidOperationException(
+                "Skip() and Take() require OrderBy().");
+        }
+
+        if (skip is not null)
+        {
+            Log($"[SKIP] {skip.Value}");
+
+            sb.AppendLine()
+              .Append($"OFFSET {skip.Value} ROWS");
+        }
+
+        if (take is not null)
+        {
+            Log($"[TAKE] {take.Value}");
+
+            sb.AppendLine()
+              .Append($"FETCH NEXT {take.Value} ROWS ONLY");
         }
 
         var sql = sb.ToString().Trim();
@@ -110,27 +147,41 @@ internal sealed class SqlCompiler
         return sql;
     }
 
-    private void Render(StringBuilder sb, SqlNode node)
+    private void Render(
+        StringBuilder sb,
+        SqlNode node)
     {
         switch (node)
         {
             case SqlRaw r:
+
                 Log($"[RAW] {r.Text}");
+
                 sb.Append(r.Text);
                 break;
 
             case SqlBinary b:
+
                 Log($"[BINARY] {b.Op}");
 
                 sb.Append("(");
+
                 Render(sb, b.Left);
-                sb.Append(" ").Append(b.Op).Append(" ");
+
+                sb.Append(" ")
+                  .Append(b.Op)
+                  .Append(" ");
+
                 Render(sb, b.Right);
+
                 sb.Append(")");
+
                 break;
 
             case SqlWhere w:
+
                 Render(sb, w.Expression);
+
                 break;
         }
     }
