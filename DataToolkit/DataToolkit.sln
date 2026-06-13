@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToolkit.Library", "Library\DataToolkit.Library\DataToolkit.Library.csproj", "{E2684254-653F-4B11-9A8F-012237826E6F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToolkit.Sample.Basic", "Demo\DataToolkit.Sample.Basic\DataToolkit.Sample.Basic.csproj", "{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{3BB2B63C-7AA9-4C0C-8C60-3CF0BD835F33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToolkit.Library", "Library\DataToolkit.Library\DataToolkit.Library.csproj", "{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToolkit.Provider.SqlServer", "Library\DataToolkit.Provider.SqlServer\DataToolkit.Provider.SqlServer.csproj", "{5257E1A6-D5FC-4494-87A7-8C6E362C134F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToolkit.Provider.Sybase", "Library\DataToolkit.Provider.Sybase\DataToolkit.Provider.Sybase.csproj", "{C0F36F97-4C85-42FF-AD44-2E4343D32E01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,20 +21,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E2684254-653F-4B11-9A8F-012237826E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2684254-653F-4B11-9A8F-012237826E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2684254-653F-4B11-9A8F-012237826E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2684254-653F-4B11-9A8F-012237826E6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5257E1A6-D5FC-4494-87A7-8C6E362C134F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5257E1A6-D5FC-4494-87A7-8C6E362C134F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5257E1A6-D5FC-4494-87A7-8C6E362C134F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5257E1A6-D5FC-4494-87A7-8C6E362C134F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0F36F97-4C85-42FF-AD44-2E4343D32E01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0F36F97-4C85-42FF-AD44-2E4343D32E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0F36F97-4C85-42FF-AD44-2E4343D32E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0F36F97-4C85-42FF-AD44-2E4343D32E01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED7C1B17-CF9A-4A0A-A079-81429F6AD25C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{12F0C7B9-AC6D-B518-0FE7-EB893F0BEE48} = {3BB2B63C-7AA9-4C0C-8C60-3CF0BD835F33}
+		{5257E1A6-D5FC-4494-87A7-8C6E362C134F} = {3BB2B63C-7AA9-4C0C-8C60-3CF0BD835F33}
+		{C0F36F97-4C85-42FF-AD44-2E4343D32E01} = {3BB2B63C-7AA9-4C0C-8C60-3CF0BD835F33}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E979E9CA-C123-47B6-BB15-B5C3AF2F7E86}

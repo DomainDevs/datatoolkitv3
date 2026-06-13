@@ -1,8 +1,8 @@
 ﻿using DataToolkit.Library.Connections;
-using DataToolkit.Library.Connections.Providers;
+using DataToolkit.Provider.SqlServer.Connections.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DataToolkit.Library.Extensions;
+namespace DataToolkit.Provider.SqlServer.Extensions;
 
 public static class SqlServerServiceCollectionExtensions
 {
