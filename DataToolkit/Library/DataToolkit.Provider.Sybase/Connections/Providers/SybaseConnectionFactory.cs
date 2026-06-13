@@ -1,12 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AdoNetCore.AseClient;
+using DataToolkit.Library.Connections;
+using Microsoft.Extensions.Configuration;
+using System.Data;
 
-namespace DataToolkit.Provider.Sybase.Connections.Providers
+namespace DataToolkit.Provider.Sybase.Connections.Providers;
+
+public class SybaseConnectionFactory : IDbConnectionFactory
 {
-    internal class SybaseConnectionFactory
+    private readonly IConfiguration _configuration;
+
+    public SybaseConnectionFactory(IConfiguration configuration)
     {
+        _configuration = configuration;
+    }
+
+    public IDbConnection CreateConnection(string dbAlias)
+    {
+        var connectionString = _configuration.GetConnectionString(dbAlias);
+        if (string.IsNullOrEmpty(connectionString))
+            throw new InvalidOperationException($"No se encontró la cadena de conexión para el alias '{dbAlias}'");
+
+        return new AseConnection(connectionString);
     }
 }
