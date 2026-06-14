@@ -1,6 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using DataToolkit.Library.Engine.Resilience;
+using Microsoft.Data.SqlClient;
 
-namespace DataToolkit.Library.Engine.Resilience;
+namespace DataToolkit.Provider.SqlServer.Resilience;
 
 public sealed class SqlRetryPolicy : IRetryPolicy
 {

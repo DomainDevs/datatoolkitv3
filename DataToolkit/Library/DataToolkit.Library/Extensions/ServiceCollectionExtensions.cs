@@ -1,6 +1,8 @@
 ﻿using DataToolkit.Library.Common;
 using DataToolkit.Library.Connections;
 using DataToolkit.Library.Engine.Resilience;
+
+//using DataToolkit.Library.Engine.Resilience;
 using DataToolkit.Library.UnitOfWorkLayer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -17,15 +19,6 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton(sp =>
             sp.GetRequiredService<IOptions<DataToolkitOptions>>().Value);
-
-        services.AddSingleton<IRetryPolicy>(sp =>
-        {
-            var opt = sp.GetRequiredService<DataToolkitOptions>();
-
-            return new SqlRetryPolicy(
-                opt.Retry.MaxRetries,
-                opt.Retry.BaseDelayMs);
-        });
 
         services.AddSingleton<RetryExecutor>();
 

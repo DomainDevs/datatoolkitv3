@@ -1,4 +1,5 @@
 ﻿using DataToolkit.Library.Engine.Abstractions;
+using DataToolkit.Library.Engine.Resilience;
 
 namespace DataToolkit.Library.Engine.Decorators;
 
