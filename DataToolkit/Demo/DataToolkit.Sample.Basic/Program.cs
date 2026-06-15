@@ -1,11 +1,17 @@
+using DataToolkit.Library.Extensions;
+using DataToolkit.Sample.Basic.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Add services to the container
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add services AddDataToolkitSample
+builder.Services.AddDataToolkitSample();
 
 var app = builder.Build();
 
