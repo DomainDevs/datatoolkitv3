@@ -24,11 +24,12 @@ public sealed class SybaseRetryPolicy : IRetryPolicy
         var message = ex.Message.ToLowerInvariant();
 
         return
-            message.Contains("deadlock") ||
-            message.Contains("timeout") ||
+            //message.Contains("deadlock") ||
+            //message.Contains("timeout") ||
+            //message.Contains("connection terminated") ||
             message.Contains("socket") ||
-            message.Contains("network") ||
-            message.Contains("connection terminated");
+            message.Contains("network");
+            
     }
 
     public TimeSpan GetDelay(int attempt)

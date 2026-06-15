@@ -1,6 +1,4 @@
-﻿using DataToolkit.Library.Engine.Resilience;
-
-namespace DataToolkit.Library.Engine.Resilience;
+﻿namespace DataToolkit.Library.Engine.Resilience;
 
 public sealed class RetryExecutor
 {

@@ -24,12 +24,48 @@ public sealed class SqlRetryPolicy : IRetryPolicy
 
         return sqlEx.Number switch
         {
-            1205 => true,  // deadlock
-            40197 => true, // azure transient
-            40501 => true,
+            // 1205
+            // Deadlock victim.
+            // SQL Server eligió esta transacción como víctima
+            // para resolver un interbloqueo.
+            // Retry: SI.
+            1205 => true,
+
+            // 40613
+            // Database unavailable.
+            // La base de datos no está disponible temporalmente.
+            // Común durante failover o recuperación.
+            // Retry: SI.
             40613 => true,
+
+            // 40197
+            // Azure SQL Database experimentó un error transitorio.
+            // Suele ocurrir durante failover, mantenimiento
+            // o reconfiguración interna del servicio.
+            // Retry: SI.
+            40197 => true,
+
+            // 40501
+            // Service Busy.
+            // Azure SQL está limitando temporalmente solicitudes
+            // por alta carga o throttling.
+            // Retry: SI.
+            40501 => true,
+
+            // 10928
+            // Resource limit reached.
+            // Se alcanzó el límite de recursos del plan
+            // (DTU, CPU, Workers, etc.).
+            // Retry: SI.
             10928 => true,
+
+            // 10929
+            // Too many requests.
+            // SQL Azure está rechazando solicitudes debido
+            // a presión de recursos o exceso de concurrencia.
+            // Retry: SI.
             10929 => true,
+
             _ => false
         };
     }
