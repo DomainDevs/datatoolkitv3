@@ -51,6 +51,12 @@ internal static class EntityMetadataHelper
                 p => p,
                 p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name);
 
+            var columnToProperty = properties.ToDictionary(
+                p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name,
+                p => p,
+                StringComparer.OrdinalIgnoreCase
+            );
+
             return new EntityMetadata
             {
                 TableName = tableName,
@@ -58,8 +64,10 @@ internal static class EntityMetadataHelper
                 KeyProperties = keys,
                 IdentityProperties = identities,
                 RequiredProperties = required,
-                ColumnMappings = columnMappings
+                ColumnMappings = columnMappings,
+                ColumnToProperty = columnToProperty
             };
+
         });
     }
 
