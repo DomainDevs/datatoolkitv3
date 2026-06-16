@@ -1,0 +1,6 @@
+@DataToolkit.Sample.Advanced_HostAddress = http://localhost:5198
+
+GET {{DataToolkit.Sample.Advanced_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

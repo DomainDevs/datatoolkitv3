@@ -1,0 +1,12 @@
+﻿CREATE TABLE Orders
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+
+    CustomerId INT NOT NULL,
+
+    Description NVARCHAR(200),
+
+    Amount DECIMAL(18,2),
+
+    CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+);
