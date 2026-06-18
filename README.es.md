@@ -1,11 +1,5 @@
 ```md
-🌎 Idioma
-
-- 🇺🇸 [English](README.md)
-- 🇪🇸 Español
 ```
-
-GitHub y los proyectos Open Source grandes suelen hacerlo así.
 
 ---
 
