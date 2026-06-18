@@ -1,6 +1,12 @@
-*.dll
-*.pdb
-*.cache
-DataToolkit/Library/DataToolkit.Library/obj/
+DataToolkit/Builder/DataToolkit.Builder/bin/
+DataToolkit/Builder/DataToolkit.Builder/obj/
+DataToolkit/Demo/DataToolkit.Sample.Advanced/bin/
+DataToolkit/Demo/DataToolkit.Sample.Advanced/obj/
+DataToolkit/Demo/DataToolkit.Sample.Basic/bin/
+DataToolkit/Demo/DataToolkit.Sample.Basic/obj/
 DataToolkit/Library/DataToolkit.Library/bin/
-DataToolkit/.vs/
+DataToolkit/Library/DataToolkit.Library/obj/
+DataToolkit/Library/DataToolkit.Provider.SqlServer/bin/
+DataToolkit/Library/DataToolkit.Provider.Sybase/obj/
+DataToolkit/Library/DataToolkit.Provider.Sybase/bin/
+DataToolkit/Library/DataToolkit.Provider.SqlServer/obj/
