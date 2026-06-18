@@ -102,7 +102,7 @@ public sealed class MigrationSqlGeneratorService
 
         return
 $"""
-INSERT INTO [{workFile.Schema}].[{workFile.TargetTable}]
+INSERT INTO [{workFile.Schema}].[WF_{workFile.TargetTable}]
 (
 {targetColumns}
 )

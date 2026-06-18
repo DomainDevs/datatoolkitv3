@@ -12,17 +12,20 @@ public class MigrationController : ControllerBase
     private readonly MigrationMetadataService _migrationMetadataService;
     private readonly MigrationWorkFileService _workFileService;
     private readonly MigrationSqlGeneratorService _sqlGeneratorService;
+    private readonly MigrationDdlGeneratorService _ddlGeneratorService;
 
     public MigrationController(
     MetadataService metadataService,
     MigrationMetadataService migrationMetadataService,
     MigrationWorkFileService workFileService,
-    MigrationSqlGeneratorService sqlGeneratorService)
+    MigrationSqlGeneratorService sqlGeneratorService,
+    MigrationDdlGeneratorService ddlGeneratorService)
     {
         _metadataService = metadataService;
         _migrationMetadataService = migrationMetadataService;
         _workFileService = workFileService;
         _sqlGeneratorService = sqlGeneratorService;
+        _ddlGeneratorService = ddlGeneratorService;
     }
 
     /// <summary>
@@ -131,6 +134,26 @@ public class MigrationController : ControllerBase
             OutputPath = outputPath,
             WorkFilesGenerated = true
         });
+    }
+
+
+    /// <summary>
+    /// Genera scripts SQL creacion tabla WF.
+    /// </summary>
+    [HttpPost("generate-ddl")]
+    public async Task<IActionResult> GenerateDdl(
+        [FromBody] CompareRequest request)
+    {
+        var metadata =
+            await _metadataService.ExtractMetadataAsync(
+                request.TargetConnectionString,
+                request.Schema,
+                request.Tables);
+
+        await _ddlGeneratorService.GenerateDdlScriptsAsync(
+            metadata);
+
+        return Ok();
     }
 
     /// <summary>
