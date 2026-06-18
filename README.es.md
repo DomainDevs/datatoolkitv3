@@ -1,23 +1,3 @@
-Sí, de hecho es la práctica más profesional.
-
-Yo tendría:
-
-```text
-README.md          -> Inglés (principal)
-README.es.md       -> Español
-```
-
-Y en el README principal agregaría arriba:
-
-```md
-🌎 Language
-
-- 🇺🇸 English (default)
-- 🇪🇸 [Español](README.es.md)
-```
-
-Y en el README.es.md:
-
 ```md
 🌎 Idioma
 
