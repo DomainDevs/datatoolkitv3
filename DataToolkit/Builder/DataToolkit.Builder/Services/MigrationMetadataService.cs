@@ -1,9 +1,32 @@
-﻿namespace DataToolkit.Builder.Services;
+﻿using DataToolkit.Builder.Configuration;
+using Microsoft.Extensions.Options;
+
+namespace DataToolkit.Builder.Services;
 
 
 public class MigrationMetadataService
 {
 
+    private readonly MigrationOptions _options;
+
+    public MigrationMetadataService(
+        IOptions<MigrationOptions> options)
+    {
+        _options = options.Value;
+    }
+
+    public string pathconfigure(int optselect = 0)
+    {
+        if (optselect == 0) {
+            return _options.WorkFilePath;
+        }
+        else
+        {
+            return _options.MetadataOutPut;
+        }
+            
+    }
+    
     /// <summary>
     /// Compara metadata y devuelve solo las diferencias.
     /// </summary>
@@ -135,6 +158,7 @@ public class MigrationMetadataService
         List<TableMetadata> targetMetadata,
         string outputPath)
     {
+        
         if (!Directory.Exists(outputPath))
             Directory.CreateDirectory(outputPath);
 
@@ -184,8 +208,8 @@ public class MigrationMetadataService
                     sb.AppendLine($"CLAVES:\tprimary key ( {string.Join(",", pkCols.Select(x => x.Name))} )");
                 }
             }
-
-            var file = Path.Combine(outputPath, $"{sourceTable.Schema}_{sourceTable.Name}_SH.txt");
+            
+            var file = Path.Combine(outputPath, $"{sourceTable.Schema}_{sourceTable.Name}_WFR.txt");
             await File.WriteAllTextAsync(file, sb.ToString(), Encoding.UTF8);
         }
     }

@@ -8,5 +8,7 @@ public sealed class MigrationOptions
 
     public string SqlOutputPath { get; set; } = "";
 
+    public string MetadataOutPut { get; set; } = "";
+
     public string DefaultSchema { get; set; } = "dbo";
 }

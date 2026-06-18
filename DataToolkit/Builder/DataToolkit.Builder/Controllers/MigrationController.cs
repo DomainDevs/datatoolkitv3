@@ -85,6 +85,7 @@ public class MigrationController : ControllerBase
                 AppContext.BaseDirectory,
                 "METADATA_OUTPUT");
 
+        outputPath = _migrationMetadataService.pathconfigure(1);
         await _migrationMetadataService.GenerateWorkFilesAsync(
             sourceMetadata,
             targetMetadata,
@@ -123,6 +124,7 @@ public class MigrationController : ControllerBase
             Path.Combine(
                 AppContext.BaseDirectory,
                 "WF_OUTPUT");
+        outputPath = _workFileService.pathconfigure();
 
         await _workFileService.GenerateMigrationWorkFilesAsync(
             sourceMetadata,
@@ -153,7 +155,15 @@ public class MigrationController : ControllerBase
         await _ddlGeneratorService.GenerateDdlScriptsAsync(
             metadata);
 
-        return Ok();
+        var outputPath = "";
+        outputPath = _workFileService.pathconfigure();
+
+        //return Ok();
+        return Ok(new
+        {
+            OutputPath = outputPath,
+            WorkFilesGenerated = true
+        });
     }
 
     /// <summary>

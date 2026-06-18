@@ -1,15 +1,30 @@
-﻿using System.Text.Json;
+﻿using DataToolkit.Builder.Configuration;
 using DataToolkit.Builder.Helpers;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace DataToolkit.Builder.Services;
 
 public sealed class MigrationWorkFileService
 {
+    private readonly MigrationOptions _options;
+
+    public MigrationWorkFileService(
+        IOptions<MigrationOptions> options)
+    {
+        _options = options.Value;
+    }
+
+    public string pathconfigure()
+    {
+        return _options.WorkFilePath;
+    }
     public async Task GenerateMigrationWorkFilesAsync(
         List<TableMetadata> sourceMetadata,
         List<TableMetadata> targetMetadata,
         string outputPath)
     {
+        outputPath = _options.WorkFilePath;
         Directory.CreateDirectory(outputPath);
 
         foreach (var sourceTable in sourceMetadata)
