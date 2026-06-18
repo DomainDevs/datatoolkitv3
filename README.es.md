@@ -384,6 +384,11 @@ permitiendo a los equipos generar y mantener soluciones de software a partir de 
 
 ---
 
+🌎 **Idioma**
+
+- 🇺🇸 [English](README.md)
+- 🇪🇸 Español
+
 ## De los Metadatos al Software.
 
 ```
