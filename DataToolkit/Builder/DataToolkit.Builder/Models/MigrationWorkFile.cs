@@ -11,4 +11,8 @@ public sealed class MigrationWorkFile
     public string TargetTable { get; set; } = "";
 
     public List<ColumnMapping> Columns { get; set; } = [];
+
+    public string? DefaultValue { get; set; }
+
+    public string? Notes { get; set; }
 }

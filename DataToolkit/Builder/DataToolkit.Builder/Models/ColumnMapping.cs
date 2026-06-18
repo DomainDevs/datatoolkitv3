@@ -9,4 +9,8 @@ public sealed class ColumnMapping
     public string Rule { get; set; } = "DIRECT";
 
     public bool Required { get; set; }
+
+    public string? DefaultValue { get; set; }
+
+    public string? Notes { get; set; }
 }

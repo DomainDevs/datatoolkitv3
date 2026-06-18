@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using DataToolkit.Builder.Helpers;
-using DataToolkit.Builder.Models;
 
 namespace DataToolkit.Builder.Services;
 
@@ -54,14 +53,22 @@ public sealed class MigrationWorkFileService
 
                 if (targetColumn is not null)
                 {
+                    var rule =
+                        DetermineRule(
+                            sourceColumn,
+                            targetColumn);
+
                     workFile.Columns.Add(new ColumnMapping
                     {
                         SourceColumn = sourceColumn.Name,
                         TargetColumn = targetColumn.Name,
-                        Rule = DetermineRule(
-                            sourceColumn,
-                            targetColumn),
-                        Required = !targetColumn.IsNullable
+                        Rule = rule,
+                        Required = !targetColumn.IsNullable,
+
+                        Notes =
+                            rule == MappingRules.Convert
+                                ? $"Convertir {sourceColumn.SqlType} -> {targetColumn.SqlType}"
+                                : null
                     });
 
                     continue;
@@ -88,7 +95,10 @@ public sealed class MigrationWorkFileService
                         SourceColumn = sourceColumn.Name,
                         TargetColumn = similarColumn.Name,
                         Rule = MappingRules.Review,
-                        Required = !similarColumn.IsNullable
+                        Required = !similarColumn.IsNullable,
+
+                        Notes =
+                            $"Revisar mapeo {sourceColumn.Name} -> {similarColumn.Name}"
                     });
 
                     continue;
@@ -103,7 +113,10 @@ public sealed class MigrationWorkFileService
                     SourceColumn = sourceColumn.Name,
                     TargetColumn = null,
                     Rule = MappingRules.Unmapped,
-                    Required = false
+                    Required = false,
+
+                    Notes =
+                        "No se encontró columna destino."
                 });
             }
 
@@ -127,7 +140,12 @@ public sealed class MigrationWorkFileService
                     SourceColumn = null,
                     TargetColumn = targetColumn.Name,
                     Rule = MappingRules.Default,
-                    Required = !targetColumn.IsNullable
+                    Required = !targetColumn.IsNullable,
+
+                    DefaultValue = null,
+
+                    Notes =
+                        "Definir valor por defecto."
                 });
             }
 
