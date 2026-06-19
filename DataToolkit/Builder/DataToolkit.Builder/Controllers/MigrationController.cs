@@ -189,7 +189,8 @@ public class MigrationController : ControllerBase
     /// </summary>
     [HttpPost("table-dependencies")]
     public async Task<IActionResult> Dependencies(
-        [FromBody] CompareRequest request)
+        [FromBody] CompareRequest request, 
+        [FromQuery] int level = 1)
     {
         var metadata =
             await _metadataService.ExtractMetadataAsync(
@@ -203,7 +204,8 @@ public class MigrationController : ControllerBase
         var dependencies =
             _dependencyService.GetDependencies(
                 tableName!,
-                metadata);
+                metadata,
+                level);
 
         return Ok(dependencies);
     }

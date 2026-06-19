@@ -1,6 +1,5 @@
 using DataToolkit.Builder.Configuration;
 using DataToolkit.Builder.Infrastructure;
-using DataToolkit.Builder.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
