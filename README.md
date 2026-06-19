@@ -1,4 +1,4 @@
-````md
+
 # DataToolkit
 
 > Genera Aplicaciones. Automatiza Migraciones. Acelera la Entrega.
