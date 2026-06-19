@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<MigrationWorkFileService>();
         services.AddScoped<MigrationSqlGeneratorService>();
         services.AddScoped<MigrationDdlGeneratorService>();
+        services.AddScoped<MigrationDependencyService>();
 
         return services;
     }

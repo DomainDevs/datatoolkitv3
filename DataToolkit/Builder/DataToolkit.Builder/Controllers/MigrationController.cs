@@ -13,19 +13,22 @@ public class MigrationController : ControllerBase
     private readonly MigrationWorkFileService _workFileService;
     private readonly MigrationSqlGeneratorService _sqlGeneratorService;
     private readonly MigrationDdlGeneratorService _ddlGeneratorService;
+    private readonly MigrationDependencyService _dependencyService;
 
     public MigrationController(
     MetadataService metadataService,
     MigrationMetadataService migrationMetadataService,
     MigrationWorkFileService workFileService,
     MigrationSqlGeneratorService sqlGeneratorService,
-    MigrationDdlGeneratorService ddlGeneratorService)
+    MigrationDdlGeneratorService ddlGeneratorService,
+    MigrationDependencyService dependencyService)
     {
         _metadataService = metadataService;
         _migrationMetadataService = migrationMetadataService;
         _workFileService = workFileService;
         _sqlGeneratorService = sqlGeneratorService;
         _ddlGeneratorService = ddlGeneratorService;
+        _dependencyService = dependencyService;
     }
 
     /// <summary>
@@ -169,7 +172,7 @@ public class MigrationController : ControllerBase
     /// <summary>
     /// Genera scripts SQL a partir de WorkFiles.
     /// </summary>
-    [HttpPost("generate-sql")]
+    [HttpPost("workFileToSql")]
     public async Task<IActionResult> GenerateSql(
         [FromBody] GenerateSqlRequest request)
     {
@@ -179,6 +182,30 @@ public class MigrationController : ControllerBase
         {
             ScriptsGenerated = true
         });
+    }
+
+    /// <summary>
+    /// Genera listado de dependecias de una tabla
+    /// </summary>
+    [HttpPost("table-dependencies")]
+    public async Task<IActionResult> Dependencies(
+        [FromBody] CompareRequest request)
+    {
+        var metadata =
+            await _metadataService.ExtractMetadataAsync(
+                request.SourceConnectionString,
+                request.Schema,
+                request.Tables);
+
+        var tableName =
+            request.Tables.FirstOrDefault();
+
+        var dependencies =
+            _dependencyService.GetDependencies(
+                tableName!,
+                metadata);
+
+        return Ok(dependencies);
     }
 
 }
