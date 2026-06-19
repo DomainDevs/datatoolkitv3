@@ -1,178 +1,179 @@
+````md
 # DataToolkit
 
-> **Generate Applications. Automate Migrations. Accelerate Delivery.**
+> Genera Aplicaciones. Automatiza Migraciones. Acelera la Entrega.
 
-DataToolkit is a metadata-driven development platform for .NET that helps teams automate software development, backend scaffolding, database modernization, and migration projects.
+DataToolkit es una plataforma de desarrollo orientada por metadatos (Metadata-Driven) para .NET que ayuda a los equipos a automatizar el desarrollo de software, la generación de soluciones backend, la modernización de bases de datos y los proyectos de migración.
 
-Instead of manually creating repetitive code and migration artifacts, DataToolkit analyzes database metadata and generates production-ready assets following modern architectural practices.
+En lugar de crear manualmente código repetitivo y artefactos de migración, DataToolkit analiza la estructura de una base de datos y genera componentes listos para producción siguiendo prácticas modernas de arquitectura de software.
 
 ---
 
-# Overview
+# Visión General
 
-Most tools solve a single problem:
+La mayoría de las herramientas resuelven un único problema:
 
-* ORMs generate entities.
-* Scaffolding tools generate CRUDs.
-* Migration tools move data.
-* Documentation tools generate technical documents.
+- Los ORM generan entidades.
+- Las herramientas de scaffolding generan CRUDs.
+- Las herramientas de migración mueven datos.
+- Las herramientas de documentación generan documentos técnicos.
 
-DataToolkit unifies these capabilities through a metadata-driven approach.
+DataToolkit unifica todas estas capacidades mediante un enfoque orientado por metadatos.
 
 ```text
-Database
-    ↓
-Metadata Discovery
-    ↓
+Base de Datos
+      ↓
+Descubrimiento de Metadatos
+      ↓
 DataToolkit
-    ↓
+      ↓
 ┌─────────────────────────────┐
-│ Entities                    │
-│ Repositories                │
-│ Services                    │
+│ Entidades                   │
+│ Repositorios                │
+│ Servicios                   │
 │ APIs                        │
 │ DTOs                        │
-│ SQL Scripts                 │
-│ Documentation               │
-│ Migration Assets            │
+│ Scripts SQL                 │
+│ Documentación               │
+│ Artefactos de Migración     │
 └─────────────────────────────┘
-```
+````
 
 ---
 
-# What is DataToolkit?
+# ¿Qué es DataToolkit?
 
-DataToolkit is not:
+DataToolkit no es:
 
-* An ORM
-* A Dapper replacement
-* A migration-only tool
-* A simple CRUD generator
+* Un ORM
+* Un reemplazo de Dapper
+* Una herramienta exclusiva de migración
+* Un simple generador CRUD
 
-DataToolkit is a development automation platform capable of generating complete backend solutions and migration assets from database metadata.
-
----
-
-# Core Principles
-
-## Metadata-Driven
-
-Everything starts from metadata.
-
-Database structures become the source of truth used to generate software artifacts and migration assets.
-
-## Lightweight
-
-Built around proven technologies such as Dapper and ADO.NET.
-
-## Automation First
-
-Reduce repetitive development tasks and accelerate delivery.
-
-## Provider Agnostic
-
-Designed to support multiple database engines and environments.
-
-## Enterprise Ready
-
-Support for transactions, resiliency, telemetry, and large-scale migration initiatives.
+DataToolkit es una plataforma de automatización de desarrollo capaz de generar soluciones backend completas y artefactos de migración a partir de metadatos.
 
 ---
 
-# Platform Components
+# Principios Fundamentales
+
+## Orientado por Metadatos
+
+Todo comienza con los metadatos.
+
+Las estructuras de la base de datos se convierten en la fuente de verdad para generar software y activos de migración.
+
+## Ligero
+
+Construido sobre tecnologías probadas como Dapper y ADO.NET.
+
+## Automatización Primero
+
+Reducir tareas repetitivas y acelerar la entrega de soluciones.
+
+## Independiente del Proveedor
+
+Diseñado para soportar múltiples motores de bases de datos.
+
+## Preparado para Entornos Empresariales
+
+Soporte para transacciones, resiliencia, telemetría y proyectos de gran escala.
+
+---
+
+# Componentes de la Plataforma
 
 ## DataToolkit.Library
 
-Runtime framework providing:
+Framework de ejecución que proporciona:
 
-* Connection Management
+* Administración de Conexiones
 * Unit Of Work
-* SQL Execution
-* Repository Pattern
-* Metadata Discovery
+* Ejecución SQL
+* Patrón Repositorio
+* Descubrimiento de Metadatos
 * Fluent Query Builder
-* Retry Policies
-* Transaction Management
+* Políticas de Reintento
+* Administración de Transacciones
 
 ```text
 DataToolkit.Library
 │
-├── Connections
-├── Providers
+├── Conexiones
+├── Proveedores
 ├── UnitOfWork
 ├── SqlExecutor
 ├── Metadata
 ├── Fluent Queries
-└── Resilience
+└── Resiliencia
 ```
 
 ---
 
 ## DataToolkit.Builder
 
-Code generation and automation engine.
+Motor de generación de código y automatización.
 
-Generates:
+Permite generar:
 
-* Domain Entities
-* Repository Interfaces
-* Repository Implementations
-* Services
+* Entidades
+* Interfaces de Repositorio
+* Implementaciones de Repositorio
+* Servicios
 * DTOs
-* API Controllers
-* Dependency Injection
-* Validation Components
-* SQL Scripts
-* Documentation
-* Migration Artifacts
+* Controladores API
+* Configuración de Inyección de Dependencias
+* Componentes de Validación
+* Scripts SQL
+* Documentación Técnica
+* Artefactos de Migración
 
 ```text
-Database
-    ↓
+Base de Datos
+      ↓
 Builder
-    ↓
-Generated Solution
+      ↓
+Solución Generada
 ```
 
 ---
 
-## Migration Toolkit
+## Toolkit de Migración
 
-Provides tooling for database modernization and migration projects.
+Proporciona herramientas para proyectos de modernización y migración de bases de datos.
 
-Capabilities include:
+Capacidades:
 
-### Inventory
+### Inventario
 
-Analyze source and target databases.
+Analiza bases de datos origen y destino.
 
-### Comparison
+### Comparación
 
-Detect schema differences.
+Detecta diferencias de esquema.
 
-### Mapping
+### Mapeo
 
-Generate migration work files.
+Genera archivos de trabajo para migración.
 
-### SQL Generation
+### Generación SQL
 
-Create migration scripts automatically.
+Crea scripts de migración automáticamente.
 
-### Validation
+### Validación
 
-Generate reconciliation and verification scripts.
+Genera scripts de conciliación y verificación.
 
-### Documentation
+### Documentación
 
-Produce migration reports and technical documentation.
+Produce reportes técnicos y documentación de migración.
 
 ---
 
-# Backend Scaffolding
+# Scaffolding Backend
 
-Generate complete backend solutions following Clean Architecture principles.
+Genera soluciones backend completas siguiendo principios de Clean Architecture.
 
-Example generated structure:
+Ejemplo:
 
 ```text
 Customer
@@ -185,7 +186,7 @@ Customer
 └── CustomerController.cs
 ```
 
-Supported layers include:
+Capas soportadas:
 
 * Domain
 * Application
@@ -195,23 +196,23 @@ Supported layers include:
 
 ---
 
-# Metadata Discovery
+# Descubrimiento de Metadatos
 
-DataToolkit discovers and models:
+DataToolkit es capaz de identificar y modelar:
 
-* Tables
-* Columns
-* Primary Keys
-* Foreign Keys
-* Constraints
-* Indexes
-* Relationships
+* Tablas
+* Columnas
+* Llaves Primarias
+* Llaves Foráneas
+* Restricciones
+* Índices
+* Relaciones
 
-This metadata becomes the foundation for all generated artifacts.
+Estos metadatos se convierten en la base para todos los artefactos generados.
 
 ---
 
-# Architecture
+# Arquitectura
 
 ```text
 ┌──────────────────────────────┐
@@ -225,7 +226,7 @@ This metadata becomes the foundation for all generated artifacts.
                │
                ▼
 ┌──────────────────────────────┐
-│ Database Providers           │
+│ Proveedores de Base de Datos │
 │ SQL Server                   │
 │ PostgreSQL                   │
 │ MySQL                        │
@@ -235,146 +236,123 @@ This metadata becomes the foundation for all generated artifacts.
 
 ---
 
-# Features
+# Características
 
-## Development
+## Desarrollo
 
-* Backend Scaffolding
-* Clean Architecture Generation
-* Repository Generation
-* Service Generation
-* API Generation
-* DTO Generation
+* Scaffolding Backend
+* Generación de Clean Architecture
+* Generación de Repositorios
+* Generación de Servicios
+* Generación de APIs
+* Generación de DTOs
 
-## Data Access
+## Acceso a Datos
 
 * Unit Of Work
-* Repository Pattern
-* Dapper Integration
+* Patrón Repositorio
+* Integración con Dapper
 * Fluent Queries
-* Dynamic SQL Generation
+* Generación Dinámica de SQL
 
-## Metadata
+## Metadatos
 
-* Database Inventory
-* Schema Discovery
-* Relationship Analysis
-* Metadata Modeling
+* Inventario de Bases de Datos
+* Descubrimiento de Esquemas
+* Análisis de Relaciones
+* Modelado de Metadatos
 
-## Migration
+## Migración
 
-* Inventory
-* Comparison
-* Mapping
+* Inventario
+* Comparación
+* Mapeo
 * Work Files
-* SQL Generation
-* Validation Scripts
+* Generación SQL
+* Scripts de Validación
 
 ---
 
-# Sample Usage
+# Casos de Uso
 
-## Service Registration
+## Desarrollo Rápido de Backends
 
-```csharp
-builder.Services.AddDataToolkit(
-    builder.Configuration);
-```
+Generar soluciones backend completas a partir de bases de datos existentes.
 
-## Unit Of Work
+## Estandarización Empresarial
 
-```csharp
-using var uow = serviceProvider
-    .GetRequiredService<IUnitOfWork>();
+Aplicar patrones arquitectónicos consistentes en múltiples proyectos.
 
-var customers = await uow.Sql
-    .QueryAsync<Customer>(
-        "SELECT * FROM Customers");
-```
+## Modernización de Sistemas Legados
 
----
+Acelerar la transformación de aplicaciones y bases de datos heredadas.
 
-# Use Cases
+## Migraciones de Bases de Datos
 
-## Rapid Backend Development
+Generar inventarios, mapeos, scripts y validaciones.
 
-Generate complete backend solutions from existing databases.
+## Automatización del Desarrollo
 
-## Enterprise Standardization
-
-Apply consistent architectural patterns across projects.
-
-## Legacy Modernization
-
-Accelerate modernization of legacy systems and databases.
-
-## Database Migration
-
-Generate migration inventories, mappings, scripts, and validation artifacts.
-
-## Development Automation
-
-Reduce manual coding effort and improve consistency.
+Reducir el esfuerzo manual y mejorar la consistencia entre proyectos.
 
 ---
 
-# Roadmap
+# Hoja de Ruta
 
-## Version 1
+## Versión 1
 
-* Data Access Framework
-* Metadata Discovery
-* Backend Scaffolding
-* Migration Builder
+* Framework de Acceso a Datos
+* Descubrimiento de Metadatos
+* Scaffolding Backend
+* Constructor de Migraciones
 
-## Version 2
+## Versión 2
 
-* Bulk Operations
-* Advanced Templates
-* Documentation Generator
-* Validation Framework
+* Operaciones Masivas (Bulk)
+* Plantillas Avanzadas
+* Generador de Documentación
+* Framework de Validación
 
-## Version 3
+## Versión 3
 
-* Visual Designer
-* ETL Integration
-* Multi-Database Workflows
-* AI-Assisted Mapping
-
----
-
-# Vision
-
-DataToolkit aims to become a unified platform for:
-
-* Backend Scaffolding
-* Development Automation
-* Metadata Management
-* Database Modernization
-* Migration Engineering
-
-allowing teams to generate and maintain software solutions from a single source of truth: metadata.
+* Diseñador Visual
+* Integración ETL
+* Flujos Multi Base de Datos
+* Asistencia mediante Inteligencia Artificial
 
 ---
 
-# Why DataToolkit?
+# Visión
 
-| Capability                    | DataToolkit | Dapper | EF Core |
+DataToolkit busca convertirse en una plataforma unificada para:
+
+* Scaffolding Backend
+* Automatización del Desarrollo
+* Gestión de Metadatos
+* Modernización de Bases de Datos
+* Ingeniería de Migraciones
+
+permitiendo a los equipos generar y mantener soluciones de software a partir de una única fuente de verdad: los metadatos.
+
+---
+
+# ¿Por qué DataToolkit?
+
+| Capacidad                     | DataToolkit | Dapper | EF Core |
 | ----------------------------- | ----------- | ------ | ------- |
-| Data Access                   | ✅           | ✅      | ✅       |
-| Metadata Discovery            | ✅           | ❌      | Partial |
-| Backend Scaffolding           | ✅           | ❌      | Partial |
-| Clean Architecture Generation | ✅           | ❌      | ❌       |
-| Migration Inventory           | ✅           | ❌      | ❌       |
-| Work File Generation          | ✅           | ❌      | ❌       |
-| SQL Generation                | ✅           | ❌      | Partial |
-| Development Automation        | ✅           | ❌      | ❌       |
+| Acceso a Datos                | ✅           | ✅      | ✅       |
+| Descubrimiento de Metadatos   | ✅           | ❌      | Parcial |
+| Scaffolding Backend           | ✅           | ❌      | Parcial |
+| Generación Clean Architecture | ✅           | ❌      | ❌       |
+| Inventario de Migración       | ✅           | ❌      | ❌       |
+| Generación de Work Files      | ✅           | ❌      | ❌       |
+| Generación SQL                | ✅           | ❌      | Parcial |
+| Automatización de Desarrollo  | ✅           | ❌      | ❌       |
 
 ---
 
-🌎 **Language**
+## De los Metadatos al Software.
 
-- 🇺🇸 English
-- 🇪🇸 [Español](README.es.md)
+```
 
-## From Metadata to Software.
+```
