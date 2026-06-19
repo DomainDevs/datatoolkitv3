@@ -350,7 +350,6 @@ permitiendo a los equipos generar y mantener soluciones de software a partir de 
 | Automatización de Desarrollo  | ✅           | ❌      | ❌       |
 
 ---
-
 ## De los Metadatos al Software.
 
 ```
