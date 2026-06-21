@@ -10,3 +10,10 @@ DataToolkit/Library/DataToolkit.Provider.SqlServer/bin/
 DataToolkit/Library/DataToolkit.Provider.Sybase/obj/
 DataToolkit/Library/DataToolkit.Provider.Sybase/bin/
 DataToolkit/Library/DataToolkit.Provider.SqlServer/obj/
+DataToolkit/Library/DataToolkit.Provider.SqlLite/obj/
+DataToolkit/Library/DataToolkit.Provider.SqlLite/bin/
+DataToolkit/Demo/DataToolkit.Sample.SqlLiteBasic/obj/
+DataToolkit/Demo/DataToolkit.Sample.SqlLiteBasic/bin/
+DataToolkit/Demo/DataToolkit.Sample.CrossDatabase/obj/
+DataToolkit/Demo/DataToolkit.Sample.CrossDatabase/bin/
+DataToolkit/.vs/

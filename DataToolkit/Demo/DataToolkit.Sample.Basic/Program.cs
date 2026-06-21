@@ -11,7 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add services AddDataToolkitSample
-builder.Services.AddDataToolkitSample();
+//builder.Services.AddDataToolkitSample();
+builder.Services.AddDataToolkitSample(builder.Configuration);
 
 var app = builder.Build();
 

@@ -1,0 +1,6 @@
+@DataToolkit.Sample.SqlLiteBasic_HostAddress = http://localhost:5288
+
+GET {{DataToolkit.Sample.SqlLiteBasic_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+@DataToolkit.Sample.CrossDatabase_HostAddress = http://localhost:5287
+
+GET {{DataToolkit.Sample.CrossDatabase_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

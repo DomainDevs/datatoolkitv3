@@ -1,6 +1,7 @@
 ﻿using DataToolkit.Library.Connections;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Core;
+using DataToolkit.Library.Engine.Resilience;
 using DataToolkit.Library.Repositories;
 using Serilog;
 using System.Data;
@@ -15,7 +16,7 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
     private IDbConnection? _connection;
     private IDbTransaction? _transaction;
 
-    private readonly ILogger _logger = Log.ForContext<UnitOfWork>();
+    //private readonly ILogger _logger = Log.ForContext<UnitOfWork>();
     private readonly Dictionary<Type, object> _repositories = new();
 
     private bool _disposed;
@@ -27,15 +28,18 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
 
     public UnitOfWork(
         IDbConnectionFactory factory,
-        string dbAlias = "SqlServer")
+        string dbAlias = "SqlServer",
+        RetryExecutor? retryExecutor = null
+        )
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         _dbAlias = dbAlias;
 
-        // ❗ Connection is created but NOT opened here (lazy ownership rule)
+        // Connection is created lazily - Opening is deferred until first use.
         Sql = new SqlExecutor(
             GetConnection,
-            GetTransaction);
+            GetTransaction,
+            retryExecutor);
     }
 
     // =========================================================
@@ -166,7 +170,11 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         try
         {
             _transaction?.Dispose();
-            
+            _transaction = null;
+
+            if (Sql is IDisposable disposable)
+                disposable.Dispose();
+
             _connection?.Dispose();
             _connection = null;
 

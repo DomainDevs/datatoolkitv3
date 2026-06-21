@@ -1,22 +1,18 @@
 ﻿using DataToolkit.Library.Extensions;
 using DataToolkit.Provider.SqlServer.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace DataToolkit.Sample.Basic.Infrastructure;
 
 public static class DataToolkitConfiguration
 {
     public static IServiceCollection AddDataToolkitSample(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddDataToolkit(options =>
-        {
-            options.DefaultConnectionAlias = "SqlServer";
-
-            options.Logging.Enabled = true;
-            options.Telemetry.Enabled = true;
-        });
-
-        services.AddDataToolkitSqlServer();
+        services
+            .AddDataToolkit(configuration)
+            .AddDataToolkitSqlServer();
 
         return services;
     }

@@ -7,11 +7,14 @@ public sealed class SqlRetryPolicy : IRetryPolicy
 {
     private readonly int _maxRetries;
     private readonly int _baseDelayMs;
+    private readonly bool _retryEnabled;
+   
 
-    public SqlRetryPolicy(int maxRetries = 3, int baseDelayMs = 200)
+    public SqlRetryPolicy(bool retryEnabled = false, int maxRetries = 3, int baseDelayMs = 200)
     {
         _maxRetries = maxRetries;
         _baseDelayMs = baseDelayMs;
+        _retryEnabled = retryEnabled;
     }
 
     public bool ShouldRetry(Exception ex, int attempt)
@@ -72,7 +75,9 @@ public sealed class SqlRetryPolicy : IRetryPolicy
 
     public TimeSpan GetDelay(int attempt)
     {
-        var ms = _baseDelayMs * Math.Pow(2, attempt);
+        var ms =
+            _baseDelayMs * Math.Pow(2, attempt - 1);
+
         return TimeSpan.FromMilliseconds(ms);
     }
 }

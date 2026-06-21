@@ -5,7 +5,7 @@ public sealed class RetryOptions
     /// <summary>
     /// Habilita o deshabilita la resiliencia.
     /// </summary>
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } = false;
 
     /// <summary>
     /// Número máximo de reintentos.

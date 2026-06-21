@@ -34,7 +34,8 @@ public sealed class SybaseRetryPolicy : IRetryPolicy
 
     public TimeSpan GetDelay(int attempt)
     {
-        var ms = _baseDelayMs * Math.Pow(2, attempt);
+        var ms =
+            _baseDelayMs * Math.Pow(2, attempt - 1);
 
         return TimeSpan.FromMilliseconds(ms);
     }

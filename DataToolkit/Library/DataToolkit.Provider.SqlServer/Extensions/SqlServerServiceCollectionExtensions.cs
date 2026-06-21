@@ -18,8 +18,10 @@ public static class SqlServerServiceCollectionExtensions
                 sp.GetRequiredService<DataToolkitOptions>();
 
             return new SqlRetryPolicy(
+                opt.Retry.Enabled,
                 opt.Retry.MaxRetries,
-                opt.Retry.BaseDelayMs);
+                opt.Retry.BaseDelayMs
+                );
         });
 
         services.AddScoped<IDbConnectionFactory,

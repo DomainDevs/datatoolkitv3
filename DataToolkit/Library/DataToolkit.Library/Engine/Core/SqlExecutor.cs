@@ -1,7 +1,8 @@
 ﻿using Dapper;
-using DataToolkit.Library.Exceptions;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Mapping;
+using DataToolkit.Library.Engine.Resilience;
+using DataToolkit.Library.Exceptions;
 using Serilog;
 using System.Data;
 
@@ -17,6 +18,7 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     private readonly Func<IDbTransaction?> _transactionProvider;
     private readonly int? _defaultTimeout;
     private readonly ILogger _logger;
+    private readonly RetryExecutor? _retryExecutor;
 
     private bool _disposed;
 
@@ -24,11 +26,13 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     internal SqlExecutor(
         Func<IDbConnection> connectionFactory,
         Func<IDbTransaction?> transactionProvider,
+        RetryExecutor? retryExecutor = null,
         int? commandTimeout = null,
         ILogger? logger = null)
     {
         _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         _transactionProvider = transactionProvider ?? (() => null);
+        _retryExecutor = retryExecutor;
         _defaultTimeout = commandTimeout;
         _logger = logger ?? Log.Logger;
     }
@@ -372,6 +376,10 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         try
         {
             ValidateSql(sql);
+            if (_retryExecutor is not null)
+            {
+                return _retryExecutor.Execute(func);
+            }
             return func();
         }
         catch (Exception ex)
@@ -390,13 +398,18 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         try
         {
             ValidateSql(sql);
+            if (_retryExecutor is not null)
+            {
+                return await _retryExecutor.ExecuteAsync(func);
+            }
             return await func();
         }
         catch (Exception ex)
         {
-            // Corregido para que sea consistente con la versión sincrónica
+            // 1. Logueo seguro sin exponer parámetros o la consulta completa
             _logger.Error(ex, "SQL async execution error. Query Length: {Length}", sql?.Length ?? 0);
 
+            // 2. Pasamos solo la longitud o un mensaje genérico para que el middleware global tampoco filtre el SQL
             throw new SqlExecutorException($"SQL async execution error (Length: {sql?.Length ?? 0})", ex);
         }
     }

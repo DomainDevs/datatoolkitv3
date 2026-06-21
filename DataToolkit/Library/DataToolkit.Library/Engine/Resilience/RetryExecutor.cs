@@ -9,8 +9,121 @@ public sealed class RetryExecutor
 
     public RetryExecutor(IRetryPolicy policy)
     {
-        _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+        ArgumentNullException.ThrowIfNull(policy);
+
+        _policy = policy;
     }
+
+    // =========================================================
+    // SYNC - ACTION
+    // =========================================================
+
+    public void Execute(Action action)
+    {
+        if (action is null)
+            throw new ArgumentNullException(nameof(action));
+
+        var attempt = 0;
+
+        while (true)
+        {
+            try
+            {
+                action();
+                return;
+            }
+            catch (Exception ex)
+            {
+                attempt++;
+
+                if (!_policy.ShouldRetry(ex, attempt))
+                    throw;
+
+                var delay =
+                    NormalizeDelay(
+                        _policy.GetDelay(attempt));
+
+                Thread.Sleep(delay);
+            }
+        }
+    }
+
+    // =========================================================
+    // SYNC - FUNC<T>
+    // =========================================================
+
+    public T Execute<T>(Func<T> action)
+    {
+        if (action is null)
+            throw new ArgumentNullException(nameof(action));
+
+        var attempt = 0;
+
+        while (true)
+        {
+            try
+            {
+                return action();
+            }
+            catch (Exception ex)
+            {
+                attempt++;
+
+                if (!_policy.ShouldRetry(ex, attempt))
+                    throw;
+
+                var delay =
+                    NormalizeDelay(
+                        _policy.GetDelay(attempt));
+
+                Thread.Sleep(delay);
+            }
+        }
+    }
+
+    // =========================================================
+    // ASYNC - TASK
+    // =========================================================
+
+    public Task ExecuteAsync(Func<Task> action)
+    {
+        if (action is null)
+            throw new ArgumentNullException(nameof(action));
+
+        return ExecuteInternalAsync(action);
+    }
+
+    private async Task ExecuteInternalAsync(Func<Task> action)
+    {
+        var attempt = 0;
+
+        while (true)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+                return;
+            }
+            catch (Exception ex)
+            {
+                attempt++;
+
+                if (!_policy.ShouldRetry(ex, attempt))
+                    throw;
+
+                var delay =
+                    NormalizeDelay(
+                        _policy.GetDelay(attempt));
+
+                await Task.Delay(delay)
+                    .ConfigureAwait(false);
+            }
+        }
+    }
+
+    // =========================================================
+    // ASYNC - TASK<T>
+    // =========================================================
 
     public Task<T> ExecuteAsync<T>(Func<Task<T>> action)
     {
@@ -20,7 +133,8 @@ public sealed class RetryExecutor
         return ExecuteInternalAsync(action);
     }
 
-    private async Task<T> ExecuteInternalAsync<T>(Func<Task<T>> action)
+    private async Task<T> ExecuteInternalAsync<T>(
+        Func<Task<T>> action)
     {
         var attempt = 0;
 
@@ -28,7 +142,8 @@ public sealed class RetryExecutor
         {
             try
             {
-                return await action().ConfigureAwait(false);
+                return await action()
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -37,12 +152,19 @@ public sealed class RetryExecutor
                 if (!_policy.ShouldRetry(ex, attempt))
                     throw;
 
-                var delay = NormalizeDelay(_policy.GetDelay(attempt));
+                var delay =
+                    NormalizeDelay(
+                        _policy.GetDelay(attempt));
 
-                await Task.Delay(delay).ConfigureAwait(false);
+                await Task.Delay(delay)
+                    .ConfigureAwait(false);
             }
         }
     }
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
 
     private static TimeSpan NormalizeDelay(TimeSpan delay)
     {

@@ -1,6 +1,12 @@
-﻿using DataToolkit.Builder.Models;
+﻿using DataToolkit.Builder.Configuration;
+using DataToolkit.Builder.Helpers;
+using DataToolkit.Builder.Models;
+using DataToolkit.Builder.Models.Requests;
+using DataToolkit.Builder.Models.Responses;
 using DataToolkit.Builder.Services;
+using DataToolkit.Builder.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace DataToolkit.Builder.Controllers;
 
@@ -14,14 +20,18 @@ public class MigrationController : ControllerBase
     private readonly MigrationSqlGeneratorService _sqlGeneratorService;
     private readonly MigrationDdlGeneratorService _ddlGeneratorService;
     private readonly MigrationDependencyService _dependencyService;
+    private readonly IMigrationReferenceDataService _referenceDataService;
+    private readonly MigrationOptions _migrationOptions;
 
     public MigrationController(
+    IOptions<MigrationOptions> options,
     MetadataService metadataService,
     MigrationMetadataService migrationMetadataService,
     MigrationWorkFileService workFileService,
     MigrationSqlGeneratorService sqlGeneratorService,
     MigrationDdlGeneratorService ddlGeneratorService,
-    MigrationDependencyService dependencyService)
+    MigrationDependencyService dependencyService,
+    IMigrationReferenceDataService referenceDataService)
     {
         _metadataService = metadataService;
         _migrationMetadataService = migrationMetadataService;
@@ -29,6 +39,8 @@ public class MigrationController : ControllerBase
         _sqlGeneratorService = sqlGeneratorService;
         _ddlGeneratorService = ddlGeneratorService;
         _dependencyService = dependencyService;
+        _referenceDataService = referenceDataService;
+        _migrationOptions = options.Value;
     }
 
     /// <summary>
@@ -208,6 +220,47 @@ public class MigrationController : ControllerBase
                 level);
 
         return Ok(dependencies);
+    }
+
+    /// <summary>
+    /// Genera homologaciones entre tablas paramétricas.
+    /// </summary>
+    [HttpPost("reference-data-script")]
+    public async Task<IActionResult> ReferenceDataScript()
+    {
+        var mapping = new ReferenceDataMappingResult
+        {
+            SourceTable = "TSEXO",
+            TargetTable = "GENDER",
+            Matches =
+            [
+                new()
+            {
+                SourceValue = "1",
+                SourceDescription = "Masculino",
+                TargetValue = "M",
+                TargetDescription = "Masculino",
+                Confidence = 100,
+                Status = MappingStatus.Auto
+            },
+            new()
+            {
+                SourceValue = "2",
+                SourceDescription = "Femenino",
+                TargetValue = "F",
+                TargetDescription = "Femenino",
+                Confidence = 100,
+                Status = MappingStatus.Auto
+            }
+            ]
+        };
+
+        var file =
+            await _referenceDataService.GenerateHomologationScriptAsync(
+                mapping,
+                _migrationOptions.SqlOutputPath);
+
+        return Ok(file);
     }
 
 }
