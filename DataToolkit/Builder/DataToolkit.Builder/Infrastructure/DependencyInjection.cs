@@ -1,6 +1,7 @@
 ﻿using DataToolkit.Builder.Configuration;
 using DataToolkit.Builder.Services;
-using DataToolkit.Builder.Services.Interfaces;
+using DataToolkit.Builder.Services.Homologation;
+using DataToolkit.Builder.Services.Homologation.Interfaces;
 using DataToolkit.Library.Extensions;
 using DataToolkit.Provider.SqlServer.Extensions;
 
@@ -18,7 +19,10 @@ public static class DependencyInjection
         services.AddScoped<MigrationSqlGeneratorService>();
         services.AddScoped<MigrationDdlGeneratorService>();
         services.AddScoped<MigrationDependencyService>();
-        services.AddScoped<IHomologationScriptGenerator, HomologationScriptGenerator>();
+        services.AddScoped<IHomologationArtifactGenerator, HomologationArtifactGenerator>();
+        services.AddScoped<IHomologationGenerationService, HomologationGenerationService>();
+        services.AddScoped<IHomologationDiscoveryService, HomologationDiscoveryService>();
+        
 
         return services;
     }
