@@ -4,8 +4,8 @@ using DataToolkit.Builder.Models.Responses;
 using DataToolkit.Builder.Services.Interfaces;
 using System.Text;
 
-public sealed class MigrationReferenceDataService
-    : IMigrationReferenceDataService
+public sealed class HomologationScriptGenerator
+    : IHomologationScriptGenerator
 {
     public async Task<string> GenerateHomologationScriptAsync(
         ReferenceDataMappingResult mapping,

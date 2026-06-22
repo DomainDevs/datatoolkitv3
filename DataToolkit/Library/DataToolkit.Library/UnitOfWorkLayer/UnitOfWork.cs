@@ -29,7 +29,6 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
     public UnitOfWork(
         IDbConnectionFactory factory,
         string dbAlias = "SqlServer"
-        //,RetryExecutor? retryExecutor = null
         )
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -39,7 +38,6 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         Sql = new SqlExecutor(
             GetConnection,
             GetTransaction
-            //,retryExecutor
             );
     }
 
@@ -144,7 +142,6 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
             return (IGenericRepository<T>)repo;
 
         var instance = new GenericRepository<T>(Sql);
-        //_repositories[typeof(T)] = instance;
         _repositories.TryAdd(typeof(T), instance);
 
         return instance;

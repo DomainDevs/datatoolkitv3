@@ -70,7 +70,6 @@ public static class ServiceCollectionExtensions
             return new UnitOfWork(
                 factory,
                 options.DefaultConnectionAlias
-                //,retryExecutor
                 );
         });
 

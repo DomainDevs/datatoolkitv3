@@ -18,7 +18,7 @@ public static class DependencyInjection
         services.AddScoped<MigrationSqlGeneratorService>();
         services.AddScoped<MigrationDdlGeneratorService>();
         services.AddScoped<MigrationDependencyService>();
-        services.AddScoped<IMigrationReferenceDataService, MigrationReferenceDataService>();
+        services.AddScoped<IHomologationScriptGenerator, HomologationScriptGenerator>();
 
         return services;
     }

@@ -20,7 +20,7 @@ public class MigrationController : ControllerBase
     private readonly MigrationSqlGeneratorService _sqlGeneratorService;
     private readonly MigrationDdlGeneratorService _ddlGeneratorService;
     private readonly MigrationDependencyService _dependencyService;
-    private readonly IMigrationReferenceDataService _referenceDataService;
+    private readonly IHomologationScriptGenerator _referenceDataService;
     private readonly MigrationOptions _migrationOptions;
 
     public MigrationController(
@@ -31,7 +31,7 @@ public class MigrationController : ControllerBase
     MigrationSqlGeneratorService sqlGeneratorService,
     MigrationDdlGeneratorService ddlGeneratorService,
     MigrationDependencyService dependencyService,
-    IMigrationReferenceDataService referenceDataService)
+    IHomologationScriptGenerator referenceDataService)
     {
         _metadataService = metadataService;
         _migrationMetadataService = migrationMetadataService;
