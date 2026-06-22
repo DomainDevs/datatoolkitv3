@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Mapping;
-using DataToolkit.Library.Engine.Resilience;
 using DataToolkit.Library.Exceptions;
+using DataToolkit.Library.Extensions.Resilience;
 using Serilog;
 using System.Data;
 
@@ -18,21 +18,19 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
     private readonly Func<IDbTransaction?> _transactionProvider;
     private readonly int? _defaultTimeout;
     private readonly ILogger _logger;
-    private readonly RetryExecutor? _retryExecutor;
+    //private readonly RetryExecutor? _retryExecutor;
 
     private bool _disposed;
 
     // ---------------- CONSTRUCTOR MODERNO (UNIT OF WORK LAZY) ----------------
     internal SqlExecutor(
         Func<IDbConnection> connectionFactory,
-        Func<IDbTransaction?> transactionProvider,
-        RetryExecutor? retryExecutor = null,
+        Func<IDbTransaction?> transactionProvider, //RetryExecutor? retryExecutor = null,
         int? commandTimeout = null,
         ILogger? logger = null)
     {
         _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-        _transactionProvider = transactionProvider ?? (() => null);
-        _retryExecutor = retryExecutor;
+        _transactionProvider = transactionProvider ?? (() => null); //_retryExecutor = retryExecutor;
         _defaultTimeout = commandTimeout;
         _logger = logger ?? Log.Logger;
     }
@@ -376,10 +374,8 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         try
         {
             ValidateSql(sql);
-            if (_retryExecutor is not null)
-            {
-                return _retryExecutor.Execute(func);
-            }
+            //if (_retryExecutor is not null) return _retryExecutor.Execute(func);
+            
             return func();
         }
         catch (Exception ex)
@@ -398,10 +394,8 @@ internal class SqlExecutor : ISqlExecutor, IDisposable
         try
         {
             ValidateSql(sql);
-            if (_retryExecutor is not null)
-            {
-                return await _retryExecutor.ExecuteAsync(func);
-            }
+            //if (_retryExecutor is not null) return await _retryExecutor.ExecuteAsync(func);
+            
             return await func();
         }
         catch (Exception ex)

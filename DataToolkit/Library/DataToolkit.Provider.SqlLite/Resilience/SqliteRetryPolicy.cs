@@ -1,4 +1,4 @@
-﻿using DataToolkit.Library.Engine.Resilience;
+﻿using DataToolkit.Library.Extensions.Resilience;
 using Microsoft.Data.Sqlite;
 
 namespace DataToolkit.Provider.Sqlite.Resilience;

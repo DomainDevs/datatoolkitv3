@@ -1,4 +1,4 @@
-﻿using DataToolkit.Library.Engine.Resilience;
+﻿using DataToolkit.Library.Extensions.Resilience;
 
 namespace DataToolkit.Provider.Sybase.Resilience;
 

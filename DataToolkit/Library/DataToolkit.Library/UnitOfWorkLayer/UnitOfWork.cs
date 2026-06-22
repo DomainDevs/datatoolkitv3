@@ -1,7 +1,7 @@
 ﻿using DataToolkit.Library.Connections;
 using DataToolkit.Library.Engine.Abstractions;
 using DataToolkit.Library.Engine.Core;
-using DataToolkit.Library.Engine.Resilience;
+using DataToolkit.Library.Extensions.Resilience;
 using DataToolkit.Library.Repositories;
 using Serilog;
 using System.Data;
@@ -28,8 +28,8 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
 
     public UnitOfWork(
         IDbConnectionFactory factory,
-        string dbAlias = "SqlServer",
-        RetryExecutor? retryExecutor = null
+        string dbAlias = "SqlServer"
+        //,RetryExecutor? retryExecutor = null
         )
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -38,8 +38,9 @@ public sealed class UnitOfWork : IUnitOfWork, IDisposable
         // Connection is created lazily - Opening is deferred until first use.
         Sql = new SqlExecutor(
             GetConnection,
-            GetTransaction,
-            retryExecutor);
+            GetTransaction
+            //,retryExecutor
+            );
     }
 
     // =========================================================

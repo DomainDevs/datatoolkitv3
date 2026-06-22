@@ -1,6 +1,6 @@
 ﻿using DataToolkit.Library.Common;
 using DataToolkit.Library.Connections;
-using DataToolkit.Library.Engine.Resilience;
+using DataToolkit.Library.Extensions.Resilience;
 using DataToolkit.Library.UnitOfWorkLayer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,8 +69,9 @@ public static class ServiceCollectionExtensions
 
             return new UnitOfWork(
                 factory,
-                options.DefaultConnectionAlias,
-                retryExecutor);
+                options.DefaultConnectionAlias
+                //,retryExecutor
+                );
         });
 
         return services;

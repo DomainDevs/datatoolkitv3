@@ -1,6 +1,6 @@
 ﻿using DataToolkit.Library.Common;
 using DataToolkit.Library.Connections;
-using DataToolkit.Library.Engine.Resilience;
+using DataToolkit.Library.Extensions.Resilience;
 using DataToolkit.Provider.Sybase.Connections.Providers;
 using DataToolkit.Provider.Sybase.Resilience;
 using Microsoft.Extensions.DependencyInjection;

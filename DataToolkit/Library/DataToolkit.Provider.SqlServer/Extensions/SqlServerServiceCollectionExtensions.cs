@@ -3,7 +3,7 @@ using DataToolkit.Library.Connections;
 using DataToolkit.Provider.SqlServer.Resilience;
 using DataToolkit.Provider.SqlServer.Connections.Providers;
 using Microsoft.Extensions.DependencyInjection;
-using DataToolkit.Library.Engine.Resilience;
+using DataToolkit.Library.Extensions.Resilience;
 
 namespace DataToolkit.Provider.SqlServer.Extensions;
 

@@ -1,4 +1,4 @@
-﻿namespace DataToolkit.Library.Engine.Resilience;
+﻿namespace DataToolkit.Library.Extensions.Resilience;
 
 public interface IRetryPolicy
 {
