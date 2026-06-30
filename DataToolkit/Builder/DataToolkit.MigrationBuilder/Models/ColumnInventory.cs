@@ -1,6 +1,6 @@
-﻿using DataToolkit.Builder.Models.Metadata;
+﻿using DataToolkit.MigrationBuilder.Models.Metadata;
 
-namespace DataToolkit.Builder.Models;
+namespace DataToolkit.MigrationBuilder.Models;
 
 public class ColumnInventory
 {

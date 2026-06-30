@@ -1,7 +1,7 @@
-﻿using DataToolkit.Builder.Models.Connections;
-using DataToolkit.Builder.Models.Metadata;
+﻿using DataToolkit.MigrationBuilder.Models.Connections;
+using DataToolkit.MigrationBuilder.Models.Metadata;
 
-namespace DataToolkit.Builder.Services;
+namespace DataToolkit.MigrationBuilder.Services;
 
 public class MetadataService
 {

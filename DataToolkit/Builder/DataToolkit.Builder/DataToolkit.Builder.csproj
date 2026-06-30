@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Library\DataToolkit.Provider.SqlServer\DataToolkit.Provider.SqlServer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Responses\" />
+  </ItemGroup>
+
 </Project>

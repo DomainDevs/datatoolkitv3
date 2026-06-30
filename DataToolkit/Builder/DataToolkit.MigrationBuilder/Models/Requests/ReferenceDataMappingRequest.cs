@@ -1,7 +1,7 @@
-﻿using DataToolkit.Builder.Models.Connections;
+﻿using DataToolkit.MigrationBuilder.Models.Connections;
 using System.ComponentModel;
 
-namespace DataToolkit.Builder.Models.Requests;
+namespace DataToolkit.MigrationBuilder.Models.Requests;
 
 public sealed class ReferenceDataMappingRequest
 {
