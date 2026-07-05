@@ -5,21 +5,39 @@ using System.Data;
 
 namespace DataToolkit.Provider.SqlServer.Connections.Providers;
 
-public class SqlServerConnectionFactory : IDbConnectionFactory
+public sealed class SqlServerConnectionFactory
+    : IDbConnectionFactory
 {
     private readonly IConfiguration _configuration;
 
-    public SqlServerConnectionFactory(IConfiguration configuration)
+    public SqlServerConnectionFactory(
+        IConfiguration configuration)
     {
-        _configuration = configuration;
+        _configuration = configuration
+            ?? throw new ArgumentNullException(nameof(configuration));
     }
 
-    public IDbConnection CreateConnection(string dbAlias)
+    public IDbConnection CreateConnection(
+        string connection)
     {
-        var connectionString = _configuration.GetConnectionString(dbAlias);
-        if (string.IsNullOrEmpty(connectionString))
-            throw new InvalidOperationException($"No se encontró la cadena de conexión para el alias '{dbAlias}'");
+        ArgumentException.ThrowIfNullOrWhiteSpace(connection);
+
+        // Si el usuario pasó directamente una cadena de conexión,
+        // se utiliza sin consultar la configuración.
+        if (ConnectionHelper.IsConnectionString(connection))
+            return new SqlConnection(connection);
+
+        // De lo contrario, se asume que es un alias definido en ConnectionStrings.
+        var connectionString =
+            _configuration.GetConnectionString(connection);
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                $"No se encontró un alias de conexión llamado '{connection}' en ConnectionStrings.");
+        }
 
         return new SqlConnection(connectionString);
     }
+
 }

@@ -3,5 +3,5 @@
 namespace DataToolkit.Library.Connections;
 public interface IDbConnectionFactory
 {
-    IDbConnection CreateConnection(string dbAlias);
+    IDbConnection CreateConnection(string connection);
 }

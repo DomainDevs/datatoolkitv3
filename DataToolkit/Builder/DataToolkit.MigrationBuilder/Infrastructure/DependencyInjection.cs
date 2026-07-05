@@ -1,10 +1,14 @@
-﻿using DataToolkit.MigrationBuilder.Configuration;
+﻿using DataToolkit.Library.Connections;
+using DataToolkit.Library.Extensions;
+using DataToolkit.MigrationBuilder.Configuration;
 using DataToolkit.MigrationBuilder.Services;
 using DataToolkit.MigrationBuilder.Services.Migration;
 using DataToolkit.MigrationBuilder.Services.Migration.Homologation;
 using DataToolkit.MigrationBuilder.Services.Migration.Homologation.Interfaces;
-using DataToolkit.Library.Extensions;
+using DataToolkit.Provider.SqlServer.Connections.Providers;
 using DataToolkit.Provider.SqlServer.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Data.Common;
 
 namespace DataToolkit.MigrationBuilder.Infrastructure;
 
@@ -23,7 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IHomologationArtifactGenerator, HomologationArtifactGenerator>();
         services.AddScoped<IHomologationGenerationService, HomologationGenerationService>();
         services.AddScoped<IHomologationDiscoveryService, HomologationDiscoveryService>();
-        
+
 
         return services;
     }
