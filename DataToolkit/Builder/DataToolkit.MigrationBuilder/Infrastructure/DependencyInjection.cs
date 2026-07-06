@@ -27,7 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IHomologationArtifactGenerator, HomologationArtifactGenerator>();
         services.AddScoped<IHomologationGenerationService, HomologationGenerationService>();
         services.AddScoped<IHomologationDiscoveryService, HomologationDiscoveryService>();
-
+        services.AddScoped<MigrationExtractionGeneratorService>();
 
         return services;
     }

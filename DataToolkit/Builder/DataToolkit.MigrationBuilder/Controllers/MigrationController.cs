@@ -15,6 +15,7 @@ namespace DataToolkit.MigrationBuilder.Controllers;
 [Route("api/[controller]")]
 public class MigrationController : ControllerBase
 {
+    private readonly MigrationOptions _migrationOptions;
     private readonly MetadataService _metadataService;
     private readonly MigrationMetadataService _migrationMetadataService;
     private readonly MigrationWorkFileService _workFileService;
@@ -22,7 +23,8 @@ public class MigrationController : ControllerBase
     private readonly MigrationDdlGeneratorService _ddlGeneratorService;
     private readonly MigrationDependencyService _dependencyService;
     private readonly IHomologationArtifactGenerator _referenceDataService;
-    private readonly MigrationOptions _migrationOptions;
+    private readonly MigrationExtractionGeneratorService _migrationExtractionGeneratorService;
+    
 
     public MigrationController(
     IOptions<MigrationOptions> options,
@@ -32,7 +34,8 @@ public class MigrationController : ControllerBase
     MigrationSqlGeneratorService sqlGeneratorService,
     MigrationDdlGeneratorService ddlGeneratorService,
     MigrationDependencyService dependencyService,
-    IHomologationArtifactGenerator referenceDataService)
+    IHomologationArtifactGenerator referenceDataService,
+    MigrationExtractionGeneratorService migrationExtractionGeneratorService)
     {
         _metadataService = metadataService;
         _migrationMetadataService = migrationMetadataService;
@@ -42,11 +45,13 @@ public class MigrationController : ControllerBase
         _dependencyService = dependencyService;
         _referenceDataService = referenceDataService;
         _migrationOptions = options.Value;
+        _migrationExtractionGeneratorService = migrationExtractionGeneratorService;
     }
 
     /// <summary>
     /// Compara metadata entre origen y destino.
     /// </summary>
+    /*
     [HttpPost("compare")]
     public async Task<IActionResult> Compare(
         [FromBody] CompareRequest request)
@@ -73,6 +78,7 @@ public class MigrationController : ControllerBase
 
         return Ok(differences);
     }
+    */
 
     /// <summary>
     /// Genera WorkFiles.
@@ -117,6 +123,7 @@ public class MigrationController : ControllerBase
     /// <summary>
     /// Genera WorkFiles de migración.
     /// </summary>
+    /*
     [HttpPost("workfiles")]
     public async Task<IActionResult> GenerateWorkFiles(
         [FromBody] CompareRequest request)
@@ -154,7 +161,7 @@ public class MigrationController : ControllerBase
             WorkFilesGenerated = true
         });
     }
-
+    */
 
     /// <summary>
     /// Genera scripts SQL creacion tabla WF.
@@ -190,9 +197,45 @@ public class MigrationController : ControllerBase
         });
     }
 
+
+    /// <summary>
+    /// Genera scripts SQL de extracción para poblar los Work Files.
+    /// </summary>
+    [HttpPost("generate-extraction")]
+    public async Task<IActionResult> GenerateExtraction(
+        [FromBody] CompareRequest request)
+    {
+        var metadataSource =
+            await _metadataService.ExtractMetadataAsync(
+                request.SourceConnectionString,
+                request.Schema,
+                request.Tables);
+
+        var metadataTarget =
+            await _metadataService.ExtractMetadataAsync(
+                request.TargetConnectionString,
+                request.Schema,
+                request.Tables);
+
+        await _migrationExtractionGeneratorService.GenerateExtractionScriptsAsync(
+            metadataSource,
+            metadataTarget,
+            request.ArtifactType);
+
+        var outputPath =
+            _workFileService.pathconfigure();
+
+        return Ok(new
+        {
+            OutputPath = outputPath,
+            ExtractionScriptsGenerated = true
+        });
+    }
+
     /// <summary>
     /// Genera scripts SQL a partir de WorkFiles.
     /// </summary>
+    /*
     [HttpPost("workFileToSql")]
     public async Task<IActionResult> GenerateSql(
         [FromBody] GenerateSqlRequest request)
@@ -204,10 +247,12 @@ public class MigrationController : ControllerBase
             ScriptsGenerated = true
         });
     }
+    */
 
     /// <summary>
     /// Genera listado de dependecias de una tabla
     /// </summary>
+    /*
     [HttpPost("table-dependencies")]
     public async Task<IActionResult> Dependencies(
         [FromBody] CompareRequest request, 
@@ -230,5 +275,6 @@ public class MigrationController : ControllerBase
 
         return Ok(dependencies);
     }
+    */
 
 }

@@ -18,7 +18,7 @@ public sealed class MigrationWorkFileService
 
     public string pathconfigure()
     {
-        return _options.WorkFilePath;
+        return _options.SqlOutputPath;
     }
     public async Task GenerateMigrationWorkFilesAsync(
         List<TableMetadata> sourceMetadata,

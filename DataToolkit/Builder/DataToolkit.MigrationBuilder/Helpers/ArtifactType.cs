@@ -3,5 +3,5 @@
 public enum ArtifactType
 {
     WorkFile = 0,
-    Homologation = 1
+    Staging = 1
 }
